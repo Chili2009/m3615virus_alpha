@@ -2,10 +2,6 @@ Reetan, Emman ja Mian lentopeli
 
 # Ohjelmisto 2 projektityö
 
-## Pelin käynnistys
-python app.py
-
-
 ## M3615 Virus
 
 Olet sairastunut vakavasti Megis-virukseen!
@@ -16,3 +12,6 @@ Joissakin maissa saat vasta-aineen suorittamalla tehtäviä kaupungissa, kun saa
 Jos et onnistu parantamaan itseäsi ennen kuin saavut viimeiseen maahan, KUOLET.
 
 Ole tarkkana — matkasi varrella saattaa tapahtua yllätyksiä!
+
+## Pelin käynnistys
+python app.py
