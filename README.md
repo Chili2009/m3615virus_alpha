@@ -2,11 +2,11 @@ Reetan, Emman ja Mian lentopeli
 
 # Ohjelmisto 2 projektityö
 
-# Pelin käynnistys
+## Pelin käynnistys
 python app.py
 
 
-# M3615 Virus
+## M3615 Virus
 
 Olet sairastunut vakavasti Megis-virukseen!
 Sinun täytyy etsiä vasta-aineet yhdeksästä eri Euroopan maasta lentämällä, jotta voit parantua.
