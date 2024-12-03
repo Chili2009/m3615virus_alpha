@@ -187,7 +187,7 @@ def find_hidden_message():
     print("It might lead to an antidote!")
 
     print("\nSolve the riddle: What month of the year has 28 days?")
-    print("The options are: 1 - All of them \n 2 - February \n 3 - December")
+    print("The options are:\n 1 - All of them \n 2 - February \n 3 - December")
     answer = input("Your answer: ").strip().lower()
     if answer == "1":
         print("Correct! The riddle reveals the antidote location.")

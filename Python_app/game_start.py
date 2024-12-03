@@ -230,11 +230,59 @@ def start_game_story():
     print("Good luck, your journey starts now!")
     print("==============================")
 
-def game_play():
-    if create_random_task
+def start_game_story():
+    print("\n==============================")
+    print("         GAME START")
+    print("==============================")
+    print("You have been infected by the deadly M3615 Virus!")
+    print("To survive, you must travel across Europe to collect antidotes.")
+    print("Select a country on the map to travel to. Complete tasks to collect antidotes.")
+    print("Good luck, your journey starts now!")
+    print("==============================")
 
+    airports = get_airport()
+    visited_countries = set()
+    health = 10
+    antidotes_collected = 0
+    max_antidotes = 9
 
+    while health > 0 and antidotes_collected < max_antidotes:
+        print("\nYour current health:", health)
+        print("Antidotes collected:", antidotes_collected, "/", max_antidotes)
 
+        print("\nAvailable airports:")
+        for idx, airport in enumerate(airports, start=1):
+            print(f"{idx}. {airport['name']} ({airport['iso_country']})")
+
+        choice = input("\nSelect a country to travel to (1-20): ").strip()
+
+        if not choice.isdigit() or int(choice) < 1 or int(choice) > len(airports):
+            print("\nInvalid selection. Please choose a valid number.")
+            continue
+
+        choice = int(choice) - 1
+        selected_airport = airports[choice]
+        country_name = selected_airport['iso_country']
+
+        if country_name in visited_countries:
+            print("\nYou have already visited this country! Choose another.")
+            continue
+
+        visited_countries.add(country_name)
+        print(f"\nTraveling to {selected_airport['name']} in {country_name}...")
+
+        task_result = create_random_task()
+        if task_result:
+            print("\nTask completed successfully!")
+            antidotes_collected += 1
+        else:
+            print("\nTask failed. You lose 1 health point.")
+            health -= 1
+
+    if antidotes_collected >= max_antidotes:
+        survived_screen("Player", health * 10 + antidotes_collected)
+    else:
+        lost_screen()
 
 # Main game logic
 def main_game():
@@ -300,3 +348,8 @@ def name_input_screen():
 
 if __name__ == "__main__":
     show_menu()
+
+
+
+
+
