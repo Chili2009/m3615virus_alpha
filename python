@@ -1,0 +1,737 @@
+from flask import Flask, jsonify
+    
+    
+    
+    app = Flask(__name__)
+    import random
+    from random import choice
+    from flask_cors import CORS
+    CORS(app)
+
+    from flask import Flask, jsonify, request
+
+    app = Flask(__name__)
+
+    import mysql.connector
+
+    conn = mysql.connector.connect(
+        host='localhost',
+        port=3306,
+        database='m3615virus_alpha',
+        user='root',
+        password='mexicana',
+        autocommit=True
+    )
+
+
+    # Start Game Endpoint
+    @app.route('/start_game', methods=['POST'])
+    def start_game():
+        # Logic to start the game, for example resetting the game state
+        game_state = {"health": 15, "antidotes": 0}
+        return jsonify(game_state)
+
+
+    # Leaderboard Endpoint
+    @app.route('/api/leaderboard', methods=['GET'])
+    def get_leaderboard():
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+            # Query the leaderboard data
+            cursor.execute("SELECT username, score FROM leaderboard ORDER BY score DESC")
+            rows = cursor.fetchall()
+
+            conn.close()
+
+            # Return data as JSON
+            return jsonify(rows)
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+
+    # Update leaderboard (post game result)
+    @app.route('/update_leaderboard', methods=['POST'])
+    def update_leaderboard():
+        data = request.get_json()  # Assuming data has {"username": "new_player", "score": 50}
+        leaderboard.append(data)
+        return jsonify({"message": "Leaderboard updated!"})
+
+
+    # Select from 20 airports in Europe for the game
+    def get_airport():
+        sql = """SELECT iso_country, ident, name, type, latitude_deg, longitude_deg
+    FROM airport
+    WHERE continent = 'EU'
+    AND type = 'large_airport'
+    AND iso_country IN ('FI', 'SE', 'NO', 'EE', 'LV', 'LT', 'PL', 'SK',
+                        'HU', 'AT', 'DE', 'CH', 'CZ', 'BE', 'NL',
+                        'FR', 'DK', 'GB', 'IE', 'IS')
+    ORDER BY RAND()
+    LIMIT 20;"""
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        return results
+
+
+    # Get all goals
+    def get_antidotes():
+        sql = "SELECT * FROM antidotes"
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        return results
+
+
+    def country():
+        sql = "SELECT * FROM countries"
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        return results
+
+
+    def event():
+        sql = "SELECT * FROM events"
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        return results
+
+
+    def leaderboard():
+        sql = "SELECT * FROM leaderboard"
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        return results
+
+
+    def players():
+        sql = "SELECT * FROM players"
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        return results
+
+
+    def tasks():
+        sql = "SELECT * FROM tasks"
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        return results
+
+
+    # Create a new game
+    def create_game(username):
+        health_bar = 10
+        current_airport = random.randint(1, 20)
+        countries_visited = 0
+        collected_antidotes = {}
+        sql = (
+            "INSERT INTO player(username, health_bar, current_airport, countries_visited, collected_antidotes) VALUES (%s, %s, %s, %s, %s)"
+        )
+        data = (username, health_bar, current_airport, countries_visited, collected_antidotes)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql, data)
+        conn.commit()
+
+# 1 task
+      def find_clue_on_board():
+            print("\nYou find a mysterious board in the airport lounge.")
+            print("It has multiple clues written in code.")
+            codes = ["X32YZ", "M3615", "H2S99"]
+            correct_code = "M3615"
+            print(f"The codes are: {', '.join(codes)}")
+            print("\nYou must choose the correct code to find the antidote.")
+
+            player_code = input("\nEnter the code you think is correct: ").strip().upper()
+            if player_code == correct_code:
+                print(f"Correct! The code '{correct_code}' reveals the antidote location.")
+                return True
+            else:
+                print(f"Wrong! The correct code was '{correct_code}'. You missed the antidote.")
+                return False
+
+
+        # 2 antidote
+      def help_an_airport_mechanic():
+            print("\nYou notice an airport mechanic struggling to repair an important system.")
+            print("They ask you to help solve a problem before the system overheats.")
+            print("You have 3 attempts to guess the right fix.")
+
+            correct_fix = random.randint(1, 10)
+            for attempt in range(3):
+                try:
+                    guess = int(input(f"\nAttempt {attempt + 1}/3 - Enter a number (1-10) to fix the system: "))
+                    if guess == correct_fix:
+                        print("You guessed correctly! The mechanic thanks you with an antidote!")
+                        return True
+                    else:
+                        print("Wrong fix. Try again.")
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+
+            print(f"The correct fix was {correct_fix}. The system fails, and you leave empty-handed.")
+            return False
+
+
+        # 3 antidote
+      def solve_a_broken_luggage_machine():
+            print("\nYou notice that the airport's luggage sorting system is malfunctioning.")
+            print("The line is getting longer, and passengers are frustrated.")
+            print("You decide to step in and fix the problem.")
+
+            print("\nWhat will you do?")
+            print("1. Try to fix the mechanical issue")
+            print("2. Work on the software issue")
+            print("3. Ask the airport staff for help")
+
+            try:
+                player_choice = int(input("\nChoose an option (1, 2, 3): "))
+                if player_choice == 1:
+                    print(
+                        "You fix the mechanical issue and the system starts working again. You gain access to an antidote!")
+                    return True
+                elif player_choice == 2:
+                    print(
+                        "You repair the software and the luggage system operates smoothly. You find a hidden antidote!")
+                    return True
+                elif player_choice == 3:
+                    print("You ask for help, and the staff give you a map with an antidote location.")
+                    return True
+                else:
+                    print("Invalid choice. Try again.")
+                    return False
+            except ValueError:
+                print("Invalid input. Try again.")
+                return False
+
+
+        # 4 task
+       def participate_in_a_quiz():
+            print("\nYou come across a travel trivia quiz being held at the airport.")
+            print("The winner gets a special prize. You decide to join and answer some questions.")
+
+            questions = [
+                ("What is the capital of Germany?", "Berlin"),
+                ("Which country is famous for the Eiffel Tower?", "France"),
+                ("Where is megis from?", "Finland")
+            ]
+
+            question, correct_answer = random.choice(questions)
+            print(f"\nQuestion: {question}")
+            player_answer = input("\nYour answer: ")
+
+            # lower tekee niin että vaikka pelaaja kirjottais esim berlin tai bERLIN nii se vastaus ois silti oikein
+            if player_answer.lower() == correct_answer.lower():
+                print("Correct! You win the prize, which includes an antidote!")
+                return True
+            else:
+                print("Incorrect answer. Better luck next time!")
+                return False
+
+
+        # 5 task
+      def help_a_lost_child():
+            print("\nA child approaches you at the airport, looking lost and scared.")
+            print("They ask you to help them find their parents. You decide to assist them.")
+
+            print("\nWhere will you look for the parents?")
+            print("1. The lost and found section")
+            print("2. The waiting area near the gates")
+            print("3. Ask the airport staff to make an announcement")
+
+            try:
+                player_choice = int(input("\nChoose an option (1, 2, 3): "))
+                if player_choice == 1:
+                    print("You find the parents in the lost and found section. They give you an antidote in gratitude!")
+                    return True
+                elif player_choice == 2:
+                    print("The parents are waiting in the lounge. They thank you and give you an antidote!")
+                    return True
+                elif player_choice == 3:
+                    print(
+                        "The staff help make an announcement. The parents come to pick up the child, and they give you an antidote!")
+                    return True
+                else:
+                    print("Invalid choice. Try again.")
+                    return False
+            except ValueError:
+                print("Invalid input. Try again.")
+                return False
+
+
+        # 6 task
+        def retrieve_lost_passenger_documents():
+            print("\nA passenger approaches you, looking stressed. They've lost their documents.")
+            print("You decide to help by following a series of clues.")
+
+            print("\nThe first clue: 'The documents are hidden where people rest.'")
+            print("1. Luggage storage area")
+            print("2. Airport lounge")
+            print("3. Bathrooms")
+
+            try:
+                choice = int(input("Your choice: "))
+                if choice == 2:
+                    print("You find the documents in the lounge! The passenger rewards you with an antidote.")
+                    return True
+                else:
+                    print("Wrong choice. The documents remain missing.")
+                    return False
+            except ValueError:
+                print("Invalid input. Try again.")
+                return False
+
+
+        # 7 task
+        def navigate_power_outage():
+            print("\nThe airport experiences a sudden power outage.")
+            print("You must navigate to safety.")
+
+            paths = ["main hallway", "emergency stairs", "lounge"]
+            safe_path = random.choice(paths)
+
+            print("\nChoose your path:")
+            print("1. Main hallway")
+            print("2. Emergency stairs")
+            print("3. Lounge")
+
+            try:
+                choice = int(input("\nYour choice (1, 2, or 3): "))
+                if paths[choice - 1] == safe_path:
+                    print(f"You safely navigate through the {paths[choice - 1]} and find an antidote!")
+                    return True
+                else:
+                    print(f"You chose the {paths[choice - 1]}, but you get lost in the dark.")
+                    return False
+            except (ValueError, IndexError):
+                print("Invalid choice. You remain stuck in the dark.")
+                return False
+
+
+        # 8 task
+        def find_hidden_message():
+            print("\nYou overhear a cryptic message being announced in the airport.")
+            print("It might lead to an antidote!")
+
+            print("\nSolve the riddle: What month of the year has 28 days?")
+            print("The options are:\n 1 - All of them \n 2 - February \n 3 - December")
+            answer = input("Your answer: ").strip().lower()
+            if answer == "1":
+                print("Correct! The riddle reveals the antidote location.")
+                return True
+            else:
+                print("Wrong answer. The message remains a mystery.")
+                return False
+
+
+        # 9 task
+        def pharmacy_backroom_task():
+            print("As you sit in the airport café, you overhear two employees whispering:")
+            print(
+                '"There’s an antidote in the pharmacy backroom near Gate 12. It’s hidden with the other experimental meds."')
+            print("You notice the pharmacy staff leaving for lunch. This might be your only chance.")
+            input("Press Enter to 'Sneak into the backroom'...")
+
+            print("\nYou carefully make your way to the pharmacy, avoiding prying eyes.")
+            print("The backroom door is slightly ajar, and you slip inside. There it is—the antidote!")
+            print("You grab the antidote and quickly leave before anyone notices.")
+            return True
+
+
+        # 10 task
+        def candy_deal_task():
+            print(
+                "\nYou are sitting in the airport lounge, and suddenly, you spot something shiny under a bench. It's an antidote!")
+            print(
+                "You reach down to grab it, but just as your hand touches it, a little child rushes over and snatches it away.")
+            print("The child looks at you with a big grin and says:")
+            print(
+                "\n'If you want this antidote, you have to buy me candy first! I want the biggest candy bar in the store!'")
+            print("\nWhat will you do?")
+            print("1. Agree to buy the candy and go to the store.")
+            print("2. Refuse and try to take the antidote from the child.")
+            print("3. Try to convince the child that the antidote is more important than candy.")
+
+            try:
+                player_choice = int(input("\nChoose an option (1, 2, 3): "))
+                if player_choice == 1:
+                    print("You go to the store, buy the biggest candy bar you can find, and return to the child.")
+                    print("The child is happy and hands you the antidote with a big smile!")
+                    return True
+                elif player_choice == 2:
+                    print("The child refuses to give you the antidote and runs away with it. You lost your chance!")
+                    return False
+                elif player_choice == 3:
+                    print("The child laughs and says, 'No way! Candy is way cooler than that!'")
+                    print("Looks like you'll have to buy the candy after all.")
+                    return False
+                else:
+                    print("Invalid choice. Try again.")
+                    return False
+            except ValueError:
+                print("Invalid input. Try again.")
+                return False
+
+    def create_random_task():
+        tasks = {
+            1: find_clue_on_board,
+            2: help_an_airport_mechanic,
+            3: solve_a_broken_luggage_machine,
+            4: participate_in_a_quiz,
+            5: help_a_lost_child,
+            6: retrieve_lost_passenger_documents,
+            7: navigate_power_outage,
+            8: find_hidden_message,
+            9: pharmacy_backroom_task,
+            10: candy_deal_task
+        }
+
+        previous_tasks = []
+
+        random_task = random.randint(1, 10)
+        while random_task in previous_tasks:
+            random_task = random.randint(1, 10)
+        previous_tasks.append(random_task)
+        result = tasks[random_task]()
+        # sql = "SELECT * FROM tasks WHERE id = random_task"
+        # cursor = conn.cursor(dictionary=True)
+        # cursor.execute(sql)
+        # task = cursor.fetchall()
+        return result
+
+
+    events = [
+    {
+        "description": "You feel someone staring at you. An elderly woman comes to you and offers you an apple. That apple really looks delicious.",
+        "choices": {
+            "success": "After eating the apple, you feel refreshed and full of energy.",
+            "failure": "After eating the apple, you start feeling sick. You must get to the plane."
+        }
+    },
+    {
+        "description": "You find a wallet lying near a vending machine. You should probably check that out.",
+        "choices": {
+            "success": "You return the wallet to its owner, who rewards you with gratitude and a snack.",
+            "failure": "While picking up the wallet, security questions your actions, causing unnecessary stress."
+        }
+    },
+    {
+        "description": "A staff member offers you a cup of coffee for free. A cup of coffee would do good for ya, no?",
+        "choices": {
+            "success": "The coffee is energizing and warms you up, making you feel great.",
+            "failure": "The coffee is too strong, making you anxious."
+        }
+    },
+    {
+        "description": "Attention! There is a storm, and it is unsafe to travel for the next 2 hours.",
+        "choices": {
+            "success": "Wait for the storm to pass. You have to wait, but you were able to take a little nap, which helped boost your energy a bit.",
+            "failure": "Travel anyway, and get lost which causes a huge delay and you lose health."
+        }
+    },
+    {
+        "description": "Someone looks at you and compliments your outfit.",
+        "choices": {
+            "success": "You feel great and thank the person, returning the same compliment to them.",
+            "failure": "You feel like they are mocking you, and you get offended. You leave without a word."
+        }
+     }]
+    
+    # Function to handle random event selection
+    def random_event(events):
+        if not events:
+            return "No more events left!"
+
+    # Select a random event
+    index = random.randint(0, len(events) - 1)
+    event = events.pop(index)  # Remove the event from the list so it can't repeat
+
+    return {
+        "description": event["description"],
+        "choices": event["choices"]
+    }
+
+    def create_random_event(random_event):
+        random_event = random.randint(1, 5)
+        previous_events = []
+        while random_event in previous_events:
+            random_event = random.randint(1, 5)
+        previous_events.append(random_event)
+        sql = "SELECT * FROM events WHERE id = random_event"
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(sql)
+        event = cursor.fetchall()
+        return event
+
+
+    def travel(airport_id):
+        task_event = random.randint(1, 3)
+        if task_event == 1:
+            task = create_random_task()
+        if task_event == 2:
+            task = create_random_event()
+        else:
+            task = None
+
+
+    # Add player to leaderboard
+    def add_to_leaderboard(username, time):
+        sql = "INSERT INTO leaderboard (username, time) VALUES (%s, %s)"
+        data = (username, time)
+        cursor = conn.cursor()
+        cursor.execute(sql, data)
+        conn.commit()
+
+
+    # You Survived screen
+    def survived_screen(username, time):
+        print("\n==============================")
+        print("         CONGRATULATIONS!")
+        print("==============================")
+        print(f"Congratulations, {username}! You survived the deadly M3615 Virus.")
+        print(f"Your final time: {time}")
+        print("==============================")
+        print("1. Add to Leaderboard")
+        print("2. Return to Menu")
+        print("==============================")
+
+        choice = input("Select an option (1/2): ")
+        if choice == "1":
+            add_to_leaderboard(username, time)
+            print("\nYour time has been added to the leaderboard!")
+        elif choice == "2":
+            show_menu()
+        else:
+            print("\nInvalid choice! Returning to menu...")
+            show_menu()
+
+
+    # Game Over screen
+    def lost_screen():
+        print("\n==============================")
+        print("           GAME OVER")
+        print("==============================")
+        print("You have succumbed to the deadly M3615 Virus.")
+        print("Better luck next time!")
+        print("==============================")
+        print("1. Return to Menu")
+        print("==============================")
+
+        choice = input("Select an option (1): ")
+        if choice == "1":
+            show_menu()
+        else:
+            print("\nInvalid choice! Returning to menu...")
+            show_menu()
+
+
+    def display_leaderboard():
+        try:
+            cursor = conn.cursor(dictionary=True)
+            sql = "SELECT username, time FROM leaderboard ORDER BY time ASC LIMIT 10;"
+            cursor.execute(sql)
+            results = cursor.fetchall()
+
+            if not results:
+                print("\nNo leaderboard data available.")
+                return
+
+            print("\n==============================")
+            print("        LEADERBOARD")
+            print("==============================")
+            print(f"{'Rank':<5} {'Player':<15} {'Time':<10}")
+            print("------------------------------")
+
+            for idx, row in enumerate(results, start=1):
+                print(f"{idx:<5} {row['username']:<15} {row['time']:<10}")
+
+            print("==============================")
+
+        except mysql.connector.Error as e:
+            print(f"Error retrieving leaderboard: {e}")
+
+
+    # Quit screen
+    def quit_confirmation():
+        print("\n==============================")
+        print("       QUIT THE GAME?")
+        print("==============================")
+        print("Do you really want to quit the game?")
+        print("1. Yes")
+        print("2. No")
+        print("==============================")
+
+        choice = input("Select an option (1/2): ")
+        if choice == "1":
+            print("\nThank you for playing! Goodbye.")
+            exit()
+        elif choice == "2":
+            print("\nReturning to the game...")
+        else:
+            print("\nInvalid choice! Returning to the game...")
+
+
+    # Placeholder story
+    def start_game_story():
+        print("\n==============================")
+        print("         GAME START")
+        print("==============================")
+        print("You have been infected by the deadly M3615 Virus!")
+        print("To survive, you must travel across Europe to collect antidotes.")
+        print("But beware, your health will decrease if you fail to collect antidotes in time.")
+        print("Complete tasks and overcome random events in each country to get antidotes.")
+        print("Good luck, your journey starts now!")
+        print("==============================")
+
+
+    def start_game_story():
+        print("\n==============================")
+        print("         GAME START")
+        print("==============================")
+        print("You have been infected by the deadly M3615 Virus!")
+        print("To survive, you must travel across Europe to collect antidotes.")
+        print("Select a country on the map to travel to. Complete tasks to collect antidotes.")
+        print("Good luck, your journey starts now!")
+        print("==============================")
+
+        airports = get_airport()
+        visited_countries = set()
+        health = 10
+        antidotes_collected = 0
+        max_antidotes = 9
+
+        while health > 0 and antidotes_collected < max_antidotes:
+            print("\nYour current health:", health)
+            print("Antidotes collected:", antidotes_collected, "/", max_antidotes)
+
+            print("\nAvailable airports:")
+            for idx, airport in enumerate(airports, start=1):
+                print(f"{idx}. {airport['name']} ({airport['iso_country']})")
+
+            choice = input("\nSelect a country to travel to (1-20): ").strip()
+
+            if not choice.isdigit() or int(choice) < 1 or int(choice) > len(airports):
+                print("\nInvalid selection. Please choose a valid number.")
+                continue
+
+            choice = int(choice) - 1
+            selected_airport = airports[choice]
+            country_name = selected_airport['iso_country']
+
+            if country_name in visited_countries:
+                print("\nYou have already visited this country! Choose another.")
+                continue
+
+            visited_countries.add(country_name)
+            print(f"\nTraveling to {selected_airport['name']} in {country_name}...")
+
+            task_result = create_random_task()
+            if task_result:
+                print("\nTask completed successfully!")
+                antidotes_collected += 1
+            else:
+                print("\nTask failed. You lose 1 health point.")
+                health -= 1
+
+        if antidotes_collected >= max_antidotes:
+            survived_screen("Player", health * 10 + antidotes_collected)
+        else:
+            lost_screen()
+
+
+    # Main game logic
+    def main_game():
+        user_name = name_input_screen()
+        if not user_name:
+            return
+
+        start_game_story()
+
+        health = 10
+        antidotes_collected = 0
+        max_antidotes = 9
+
+        while health > 0 and antidotes_collected < max_antidotes:
+            print(f"\nHealth: {health} | Antidotes Collected: {antidotes_collected}/{max_antidotes}")
+            health -= 1
+            antidotes_collected += 1
+
+        if antidotes_collected >= max_antidotes:
+            survived_screen(user_name, health * 10 + antidotes_collected)
+        else:
+            lost_screen()
+
+
+    # Show menu
+    def show_menu():
+        while True:
+            print("\n==============================")
+            print("     WELCOME TO M3615 VIRUS")
+            print("==============================")
+            print("1. Start Game")
+            print("2. Leaderboard")
+            print("3. Quit")
+            print("==============================")
+
+            choice = input("Select an option (1/2/3): ")
+
+            if choice == "1":
+                main_game()
+            elif choice == "2":
+                display_leaderboard()
+            elif choice == "3":
+                quit_confirmation()
+            else:
+                print("\nInvalid option! Please choose again.")
+
+
+    # Name input screen
+    def name_input_screen():
+        print("\n==============================")
+        print("      ENTER YOUR NAME")
+        print("==============================")
+        user_name = input("Enter your name: ").strip()
+
+        if user_name:
+            print(f"\nWelcome, {user_name}! Get ready for the game.")
+            return user_name
+        else:
+            print("\nYou must enter a name to continue!")
+            return None
+
+
+    if __name__ == "__main__":
+        show_menu()
+
+        import random
+
+        player = {
+            "name": "...",
+            "health": 0,
+            "current_location": "FI",
+            "collected_antidotes": []
+        }
+
+    @app.route('/api/task_or_event', methods=['GET'])
+    def task_or_event():
+        # Randomly choose between task and event
+        if random.choice([True, False]):
+            item = create_random_task()  # Call your function to create a random task
+            item_type = 'task'
+        else:
+            item = create_random_event()  # Call your function to create a random event
+            item_type = 'event'
+
+        # Return the chosen item and its type in JSON format
+        return jsonify({"item": item, "type": item_type})
+
+
+    if __name__ == '__main__':
+        app.run(use_reloader=True, host='127.0.0.1', port=3000)
