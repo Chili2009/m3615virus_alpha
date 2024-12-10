@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Menu</title>
+    <link rel="stylesheet" href="t.css">
+</head>
+<body>
+    <!-- Menu Section -->
+    <div id="menu-section">
+        <button id="startBtn" class="btn">Start Game</button>
+        <button id="leaderboardBtn" class="btn">Leaderboard</button>
+        <button id="quitBtn" class="btn">Quit</button>
+    </div>
+
+    <div id="leaderboard-section" style="display: none;">
+        <h2>Leaderboard</h2>
+        <ul id="leaderboard-list"></ul>
+        <button id="backToMenuBtn">Back to Menu</button>
+    </div>
+
+    <div id="game-section" style="display: none;">
+        <h2>Game Started!</h2>
+        <img src="placeholder-image.jpg" alt="Placeholder" id="game-image">
+    <p id="game-text">You are about to start your adventure.</p>
+    <button id="goToCockpitBtn">Go to Cockpit</button>
+</div>
+
+    <div id="cockpit-section" style="display: none;">
+    <h2>Cockpit</h2>
+    <div id="map">
+        <!-- Map goes here (image or interactive map) -->
+        <img src="map-placeholder.jpg" alt="Map" id="map-image">
+        <p>Click on the map to choose your destination.</p>
+    </div>
+    <button id="startJourneyBtn">Start Journey</button>
+</div>
+
+    <!-- Event/Task Section -->
+<div id="event-section" style="display: none;">
+    <h2>Random Event</h2>
+    <p id="event-description"></p>
+    <button id="nextBtn">Next</button>
+</div>
+
+    <script src="t.js"></script>
+</body>
+</html>
