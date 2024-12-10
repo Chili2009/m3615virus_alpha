@@ -723,13 +723,12 @@ from flask import Flask, jsonify
     def task_or_event():
         # Randomly choose between task and event
         if random.choice([True, False]):
-            item = create_random_task()  # Call your function to create a random task
+            item = create_random_task()
             item_type = 'task'
         else:
-            item = create_random_event()  # Call your function to create a random event
+            item = create_random_event()
             item_type = 'event'
 
-        # Return the chosen item and its type in JSON format
         return jsonify({"item": item, "type": item_type})
 
 
