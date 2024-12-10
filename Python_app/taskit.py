@@ -198,30 +198,16 @@ def find_hidden_message():
 
 
 # 9 task
-def navigate_power_outage():
-    print("\nThe airport is hit by a sudden power outage. It's dark, and the emergency lights are barely visible.")
-    print("You need to find a way to restore the power, but the clues are scattered around.")
+def pharmacy_backroom_task():
+    print("As you sit in the airport café, you overhear two employees whispering:")
+    print('"There’s an antidote in the pharmacy backroom near Gate 12. It’s hidden with the other experimental meds."')
+    print("You notice the pharmacy staff leaving for lunch. This might be your only chance.")
+    input("Press Enter to 'Sneak into the backroom'...")
 
-    print("\nYou come across a note with a clue: 'The solution is hidden where the wires meet the ground.'")
-    print("You can either:")
-    print("1. Look under the control desk.")
-    print("2. Ask an airport staff member about the situation.")
-
-    try:
-        player_choice = int(input("\nChoose an option (1, 2): "))
-        if player_choice == 1:
-            print("Under the control desk, you find some spare parts, but no reset button. Keep searching.")
-            return False
-        elif player_choice == 2:
-            print(
-                "The staff member gives you a hint: 'Check where the wires meet the ground.' That leads you to the emergency panel!")
-            return True
-        else:
-            print("Invalid choice. Try again.")
-            return False
-    except ValueError:
-        print("Invalid input. Try again.")
-        return False
+    print("\nYou carefully make your way to the pharmacy, avoiding prying eyes.")
+    print("The backroom door is slightly ajar, and you slip inside. There it is—the antidote!")
+    print("You grab the antidote and quickly leave before anyone notices.")
+    return True
 
 
 # 10 task
