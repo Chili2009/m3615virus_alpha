@@ -26,20 +26,13 @@ AND type = 'large_airport'
 AND iso_country IN ('FI', 'SE', 'NO', 'EE', 'LV', 'LT', 'PL', 'SK',
                     'HU', 'AT', 'DE', 'CH', 'CZ', 'BE', 'NL',
                     'FR', 'DK', 'GB', 'IE', 'IS')
+GROUP BY iso_country
 ORDER BY RAND()
 LIMIT 20;"""
     cursor = conn.cursor(dictionary=True)
     cursor.execute(sql)
     results = cursor.fetchall()
     return results
-
-
-
-
-
-
-
-
 
 
 
@@ -90,11 +83,6 @@ def tasks():
     cursor.execute(sql)
     results = cursor.fetchall()
     return results
-
-
-
-
-
 
 
 
@@ -173,7 +161,6 @@ def add_to_leaderboard(username, time, health):
     conn.commit()
 
 
-
 def update_player_progress(player_id, health, visited_countries, antidotes_collected):
     sql = """
     UPDATE player
@@ -186,8 +173,6 @@ def update_player_progress(player_id, health, visited_countries, antidotes_colle
     cursor = conn.cursor()
     cursor.execute(sql, data)
     conn.commit()
-
-
 
 
 
@@ -231,7 +216,7 @@ def name_input_screen():
         return None
 
 
-
+# Leaderboard
 def display_leaderboard():
     sql = "SELECT * FROM leaderboard ORDER BY time ASC"
     cursor = conn.cursor(dictionary=True)
@@ -334,52 +319,6 @@ def start_game_story(player_id):
     print("Good luck, your journey starts now!")
     print("==============================")
 
-    airports = get_airport()
-    health = 10
-    antidotes_collected = 0
-    visited_countries = set()
-
-    while health > 0 and antidotes_collected < 9 and len(visited_countries) < 9:
-        print(f"\nHealth: {health}, Antidotes Collected: {antidotes_collected}/9")
-        print("Available Airports:")
-        for idx, airport in enumerate(airports, start=1):
-            print(f"{idx}. {airport['name']} ({airport['iso_country']})")
-
-        choice = input("Select an airport (1-20): ").strip()
-        if not choice.isdigit() or not (1 <= int(choice) <= len(airports)):
-            print("Invalid choice. Try again.")
-            continue
-
-        selected_airport = airports[int(choice) - 1]
-        country = selected_airport['iso_country'].strip().upper()  # Normalize
-
-        if country in visited_countries:
-            print("You have already visited this country. Choose another.")
-            continue
-
-        visited_countries.add(country)  # Add to visited set
-        print(f"\nTraveling to {selected_airport['name']} in {country}...")
-
-        outcome = travel()
-        if outcome == "task":
-            print("You successfully completed a task and gained an antidote!")
-            antidotes_collected += 1
-        elif outcome == "event":
-            print("An event occurred during your travel.")
-            # Event outcomes may already update health based on implementation
-        else:
-            print("Nothing happened during this visit.")
-
-        health -= 1  # Deduct health for traveling
-        if health <= 0:
-            print("You have run out of health!")
-
-    if antidotes_collected >= 9:
-        print("\nCongratulations! You collected all antidotes and survived!")
-    else:
-        print("\nGame Over. You were unable to collect enough antidotes in time.")
-
-
 
 # Main game logic
 def main_game():
@@ -389,7 +328,7 @@ def main_game():
 
     health = 10
     antidotes_collected = 0
-    max_antidotes = 9
+    max_antidotes = 5
     visited_countries = set()
     airports = get_airport()
 
@@ -406,11 +345,12 @@ def main_game():
 
         choice = int(choice) - 1
         selected_airport = airports[choice]
-        country = selected_airport['iso_country']
+        country = selected_airport['name']
 
         if country in visited_countries:
             print("You have already visited this country! Choose another.")
             continue
+
 
         visited_countries.add(country)
         print(f"\nTraveling to {selected_airport['name']} in {country}...")
@@ -430,8 +370,6 @@ def main_game():
             create_random_event()
         else:
             print("Nothing happened during this visit.")
-
-        #health -= 1  # Deduct health for traveling
 
     if antidotes_collected >= max_antidotes:
         survived_screen(user_name, antidotes_collected * 10, health)
