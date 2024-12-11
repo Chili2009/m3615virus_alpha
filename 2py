@@ -1,0 +1,430 @@
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+import random
+from random import choice
+from flask_cors import CORS
+
+CORS(app)
+
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+import mysql.connector
+
+conn = mysql.connector.connect(
+    host='localhost',
+    port=3306,
+    database='flight_game',
+    user='root',
+    password='euch7soo',
+    autocommit=True
+    )
+
+
+# Start Game Endpoint
+@app.route('/start_game', methods=['POST'])
+def start_game():
+    # Logic to start the game, for example resetting the game state
+    game_state = {"health": 15, "antidotes": 0}
+    return jsonify(game_state)
+
+########################
+# Leaderboard Endpoint
+@app.route('/api/leaderboard', methods=['GET'])
+def get_leaderboard():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        # Query the leaderboard data
+        cursor.execute("SELECT username, score FROM leaderboard ORDER BY score DESC")
+        rows = cursor.fetchall()
+
+        conn.close()
+
+        # Return data as JSON
+        return jsonify(rows)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Update leaderboard (post game result)
+@app.route('/update_leaderboard', methods=['POST'])
+def update_leaderboard():
+    data = request.get_json()  # Assuming data has {"username": "new_player", "score": 50}
+    leaderboard.append(data)
+    return jsonify({"message": "Leaderboard updated!"})
+
+
+# Select from 20 airports in Europe for the game
+def get_airport():
+    sql = """SELECT iso_country, ident, name, type, latitude_deg, longitude_deg
+    FROM airport
+    WHERE continent = 'EU'
+    AND type = 'large_airport'
+    AND iso_country IN ('FI', 'SE', 'NO', 'EE', 'LV', 'LT', 'PL', 'SK',
+                        'HU', 'AT', 'DE', 'CH', 'CZ', 'BE', 'NL',
+                        'FR', 'DK', 'GB', 'IE', 'IS')
+    ORDER BY RAND()
+    LIMIT 20;"""
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+
+# Get all goals
+def get_antidotes():
+    sql = "SELECT * FROM antidotes"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+
+def country():
+    sql = "SELECT * FROM countries"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+
+def event():
+    sql = "SELECT * FROM events"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+
+def leaderboard():
+    sql = "SELECT * FROM leaderboard"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+
+def players():
+    sql = "SELECT * FROM players"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+
+def tasks():
+    sql = "SELECT * FROM tasks"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+
+# Create a new game
+def create_game(username):
+    health_bar = 10
+    current_airport = random.randint(1, 20)
+    countries_visited = 0
+    collected_antidotes = {}
+    sql = (
+        "INSERT INTO player(username, health_bar, current_airport, countries_visited, collected_antidotes) VALUES (%s, %s, %s, %s, %s)"
+    )
+    data = (username, health_bar, current_airport, countries_visited, collected_antidotes)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql, data)
+    conn.commit()
+
+
+def travel(airport_id):
+    task_event = random.randint(1, 3)
+    if task_event == 1:
+        task = create_random_task()
+    if task_event == 2:
+        task = create_random_event()
+    else:
+        task = None
+
+
+# Add player to leaderboard
+def add_to_leaderboard(username, time):
+    sql = "INSERT INTO leaderboard (username, time) VALUES (%s, %s)"
+    data = (username, time)
+    cursor = conn.cursor()
+    cursor.execute(sql, data)
+    conn.commit()
+
+
+# You Survived screen
+def survived_screen(username, time):
+    print("\n==============================")
+    print("         CONGRATULATIONS!")
+    print("==============================")
+    print(f"Congratulations, {username}! You survived the deadly M3615 Virus.")
+    print(f"Your final time: {time}")
+    print("==============================")
+    print("1. Add to Leaderboard")
+    print("2. Return to Menu")
+    print("==============================")
+
+    choice = input("Select an option (1/2): ")
+    if choice == "1":
+        add_to_leaderboard(username, time)
+        print("\nYour time has been added to the leaderboard!")
+    elif choice == "2":
+        show_menu()
+    else:
+        print("\nInvalid choice! Returning to menu...")
+        show_menu()
+
+
+# Game Over screen
+def lost_screen():
+    print("\n==============================")
+    print("           GAME OVER")
+    print("==============================")
+    print("You have succumbed to the deadly M3615 Virus.")
+    print("Better luck next time!")
+    print("==============================")
+    print("1. Return to Menu")
+    print("==============================")
+
+    choice = input("Select an option (1): ")
+    if choice == "1":
+        show_menu()
+    else:
+        print("\nInvalid choice! Returning to menu...")
+        show_menu()
+
+
+def display_leaderboard():
+    try:
+        cursor = conn.cursor(dictionary=True)
+        sql = "SELECT username, time FROM leaderboard ORDER BY time ASC LIMIT 10;"
+        cursor.execute(sql)
+        results = cursor.fetchall()
+
+        if not results:
+            print("\nNo leaderboard data available.")
+            return
+
+        print("\n==============================")
+        print("        LEADERBOARD")
+        print("==============================")
+        print(f"{'Rank':<5} {'Player':<15} {'Time':<10}")
+        print("------------------------------")
+
+        for idx, row in enumerate(results, start=1):
+            print(f"{idx:<5} {row['username']:<15} {row['time']:<10}")
+
+        print("==============================")
+
+    except mysql.connector.Error as e:
+        print(f"Error retrieving leaderboard: {e}")
+
+
+# Quit screen
+def quit_confirmation():
+    print("\n==============================")
+    print("       QUIT THE GAME?")
+    print("==============================")
+    print("Do you really want to quit the game?")
+    print("1. Yes")
+    print("2. No")
+    print("==============================")
+
+    choice = input("Select an option (1/2): ")
+    if choice == "1":
+        print("\nThank you for playing! Goodbye.")
+        exit()
+    elif choice == "2":
+        print("\nReturning to the game...")
+    else:
+        print("\nInvalid choice! Returning to the game...")
+
+
+# Placeholder story
+def start_game_story():
+    print("\n==============================")
+    print("         GAME START")
+    print("==============================")
+    print("You have been infected by the deadly M3615 Virus!")
+    print("To survive, you must travel across Europe to collect antidotes.")
+    print("But beware, your health will decrease if you fail to collect antidotes in time.")
+    print("Complete tasks and overcome random events in each country to get antidotes.")
+    print("Good luck, your journey starts now!")
+    print("==============================")
+
+
+def start_game_story():
+    print("\n==============================")
+    print("         GAME START")
+    print("==============================")
+    print("You have been infected by the deadly M3615 Virus!")
+    print("To survive, you must travel across Europe to collect antidotes.")
+    print("Select a country on the map to travel to. Complete tasks to collect antidotes.")
+    print("Good luck, your journey starts now!")
+    print("==============================")
+
+    airports = get_airport()
+    visited_countries = set()
+    health = 10
+    antidotes_collected = 0
+    max_antidotes = 9
+
+    while health > 0 and antidotes_collected < max_antidotes:
+        print("\nYour current health:", health)
+        print("Antidotes collected:", antidotes_collected, "/", max_antidotes)
+
+        print("\nAvailable airports:")
+        for idx, airport in enumerate(airports, start=1):
+            print(f"{idx}. {airport['name']} ({airport['iso_country']})")
+
+        choice = input("\nSelect a country to travel to (1-20): ").strip()
+
+        if not choice.isdigit() or int(choice) < 1 or int(choice) > len(airports):
+            print("\nInvalid selection. Please choose a valid number.")
+            continue
+
+        choice = int(choice) - 1
+        selected_airport = airports[choice]
+        country_name = selected_airport['iso_country']
+
+        if country_name in visited_countries:
+            print("\nYou have already visited this country! Choose another.")
+            continue
+
+        visited_countries.add(country_name)
+        print(f"\nTraveling to {selected_airport['name']} in {country_name}...")
+
+        task_result = create_random_task()
+        if task_result:
+            print("\nTask completed successfully!")
+            antidotes_collected += 1
+        else:
+            print("\nTask failed. You lose 1 health point.")
+            health -= 1
+
+    if antidotes_collected >= max_antidotes:
+        survived_screen("Player", health * 10 + antidotes_collected)
+    else:
+        lost_screen()
+
+
+# Main game logic
+def main_game():
+    user_name = name_input_screen()
+    if not user_name:
+        return
+
+    start_game_story()
+
+    health = 10
+    antidotes_collected = 0
+    max_antidotes = 9
+
+    while health > 0 and antidotes_collected < max_antidotes:
+        print(f"\nHealth: {health} | Antidotes Collected: {antidotes_collected}/{max_antidotes}")
+        health -= 1
+        antidotes_collected += 1
+
+    if antidotes_collected >= max_antidotes:
+        survived_screen(user_name, health * 10 + antidotes_collected)
+    else:
+        lost_screen()
+
+
+# Show menu
+def show_menu():
+    while True:
+        print("\n==============================")
+        print("     WELCOME TO M3615 VIRUS")
+        print("==============================")
+        print("1. Start Game")
+        print("2. Leaderboard")
+        print("3. Quit")
+        print("==============================")
+
+        choice = input("Select an option (1/2/3): ")
+
+        if choice == "1":
+            main_game()
+        elif choice == "2":
+            display_leaderboard()
+        elif choice == "3":
+            quit_confirmation()
+        else:
+            print("\nInvalid option! Please choose again.")
+
+    # Name input screen
+
+
+def name_input_screen():
+    print("\n==============================")
+    print("      ENTER YOUR NAME")
+    print("==============================")
+    user_name = input("Enter your name: ").strip()
+
+    if user_name:
+        print(f"\nWelcome, {user_name}! Get ready for the game.")
+        return user_name
+    else:
+        print("\nYou must enter a name to continue!")
+        return None
+
+
+if __name__ == "__main__":
+    show_menu()
+
+    player = {
+        "name": "...",
+        "health": 0,
+        "current_location": "FI",
+        "collected_antidotes": []
+
+    }
+
+
+
+##täs on nyt toinen python file, missä ne apipyynnöt, ja huom!! ne taskit ja eventit oli pakko poistaa tosta toisesta ku tosiaan kokeilen nyt vähän et mikä setuppi toimis, eli tos on nyt joku ihan radnom ai:n antama lista nii älä välitä noist vaihtoehdoista
+from flask import Flask, jsonify
+from flask_cors import CORS  # Add this for handling CORS issues
+import random
+
+app = Flask(__name__)
+CORS(app)  # Enable cross-origin requests
+
+@app.route('/api/leaderboard', methods=['GET'])
+def leaderboard():
+    # Example leaderboard data
+    leaderboard_data = [
+        {"username": "Player1", "score": 100},
+        {"username": "Player2", "score": 90}
+    ]
+    return jsonify(leaderboard_data)
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
+
+
+    @app.route('/api/random_event_or_task', methods=['GET'])
+    def get_random_event_or_task():
+        events = [
+            {"name": "Find the antidote", "description": "You need to search the area to find the antidote."},
+            {"name": "Defend the camp", "description": "Defend the camp from hostile forces."},
+            {"name": "Secure the area", "description": "You must secure the area from dangerous creatures."},
+            {"name": "Retrieve the data",
+             "description": "You need to hack into the enemy database to retrieve important information."},
+            {"name": "Escape the island", "description": "The island is sinking, you must escape before it's too late."}
+        ]
+
+        # Randomly select an event or task
+        event_or_task = random.choice(events)
+        return jsonify(event_or_task)
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
