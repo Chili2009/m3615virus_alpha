@@ -337,7 +337,7 @@ def start_game_story(player_id):
     airports = get_airport()
     health = 10
     antidotes_collected = 0
-    visited_countries = []
+    visited_countries = set()
 
     while health > 0 and antidotes_collected < 9 and len(visited_countries) < 9:
         print(f"\nHealth: {health}, Antidotes Collected: {antidotes_collected}/9")
@@ -351,13 +351,13 @@ def start_game_story(player_id):
             continue
 
         selected_airport = airports[int(choice) - 1]
-        country = selected_airport['iso_country']
+        country = selected_airport['iso_country'].strip().upper()  # Normalize
 
         if country in visited_countries:
             print("You have already visited this country. Choose another.")
             continue
 
-        visited_countries.append(country)
+        visited_countries.add(country)  # Add to visited set
         print(f"\nTraveling to {selected_airport['name']} in {country}...")
 
         outcome = travel()
@@ -378,6 +378,7 @@ def start_game_story(player_id):
         print("\nCongratulations! You collected all antidotes and survived!")
     else:
         print("\nGame Over. You were unable to collect enough antidotes in time.")
+
 
 
 # Main game logic
@@ -430,6 +431,7 @@ def main_game():
         else:
             print("Nothing happened during this visit.")
 
+        #health -= 1  # Deduct health for traveling
 
     if antidotes_collected >= max_antidotes:
         survived_screen(user_name, antidotes_collected * 10, health)
