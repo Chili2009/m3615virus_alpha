@@ -1,12 +1,13 @@
 import random
-from random import choice
-
 import mysql.connector
+import events
 import taskit
 
 from Python_app.taskit import find_clue_on_board, help_an_airport_mechanic, solve_a_broken_luggage_machine, \
     participate_in_a_quiz, help_a_lost_child, retrieve_lost_passenger_documents, navigate_power_outage, \
     find_hidden_message, candy_deal_task
+
+from Python_app.events import apple_offer, wallet_discovery, free_coffee_offer, storm_alert, outfit_compliment
 
 conn = mysql.connector.connect(
     host='localhost',
@@ -117,23 +118,23 @@ def create_random_task():
         random_task = random.randint(1, 10)
     previous_tasks.append(random_task)
     result = tasks[random_task]()
-    #sql = "SELECT * FROM tasks WHERE id = random_task"
-    #cursor = conn.cursor(dictionary=True)
-    #cursor.execute(sql)
-    #task = cursor.fetchall()
     return result
 
 
 def create_random_event():
-    random_event = random.randint(1, 5)
+    event = {
+        1: apple_offer,
+        2: wallet_discovery,
+        3: free_coffee_offer,
+        4: storm_alert,
+        5: outfit_compliment
+    }
     previous_events = []
+    random_event = random.randint(1, 5)
     while random_event in previous_events:
         random_event = random.randint(1, 5)
     previous_events.append(random_event)
-    sql = "SELECT * FROM events WHERE id = random_event"
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute(sql)
-    event = cursor.fetchall()
+    result = event[random_event]()
     return event
 
 
@@ -146,23 +147,111 @@ def travel(airport_id):
     else:
         task = None
 
-
 # Add player to leaderboard
-def add_to_leaderboard(username, time):
-    sql = "INSERT INTO leaderboard (username, time) VALUES (%s, %s)"
-    data = (username, time)
+def add_to_leaderboard(username, time, health):
+    sql = "INSERT INTO leaderboard (username, time) VALUES (%s, %s, %s)"
+    data = (username, time, health)
     cursor = conn.cursor()
     cursor.execute(sql, data)
     conn.commit()
 
 
+
+# Show menu
+def show_menu():
+    while True:
+        print("\n==============================")
+        print("     WELCOME TO M3615 VIRUS")
+        print("==============================")
+        print("1. Start Game")
+        print("2. Leaderboard")
+        print("3. Quit")
+        print("==============================")
+
+        choice = input("Select an option (1/2/3): ")
+
+        if choice == "1":
+            main_game()
+        elif choice == "2":
+            display_leaderboard()
+        elif choice == "3":
+            quit_confirmation()
+        else:
+            print("\nInvalid option! Please choose again.")
+
+
+
+# Name input screen
+def name_input_screen():
+    print("\n==============================")
+    print("      ENTER YOUR NAME")
+    print("==============================")
+    user_name = input("Enter your name: ").strip()
+
+    if user_name:
+        print(f"\nWelcome, {user_name}! Get ready for the game.")
+        return user_name
+    else:
+        print("\nYou must enter a name to continue!")
+        return None
+
+
+
+def display_leaderboard():
+    sql = "SELECT * FROM leaderboard ORDER BY time ASC"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+
+    print("\n==============================")
+    print("        LEADERBOARD")
+    print("==============================")
+    print(f"{'Username':<20}{'Time (Seconds)':<20}{'Health'}")
+    print("==============================")
+
+    for row in results:
+        print(f"{row['username']:<20}{row['time']:<20}{row['Health']}")
+
+    print("==============================")
+    print("1. Return to Menu")
+    choice = input("Select an option (1): ")
+    if choice == "1":
+        show_menu()
+    else:
+        print("\nInvalid choice! Returning to menu...")
+        show_menu()
+
+
+
+# Quit screen
+def quit_confirmation():
+    print("\n==============================")
+    print("       QUIT THE GAME?")
+    print("==============================")
+    print("Do you really want to quit the game?")
+    print("1. Yes")
+    print("2. No")
+    print("==============================")
+
+    choice = input("Select an option (1/2): ")
+    if choice == "1":
+        print("\nThank you for playing! Goodbye.")
+        exit()
+    elif choice == "2":
+        print("\nReturning to the game...")
+    else:
+        print("\nInvalid choice! Returning to the game...")
+
+
+
 # You Survived screen
-def survived_screen(username, time):
+def survived_screen(username, time, health):
     print("\n==============================")
     print("         CONGRATULATIONS!")
     print("==============================")
     print(f"Congratulations, {username}! You survived the deadly M3615 Virus.")
     print(f"Your final time: {time}")
+    print(f"Your health: {health}")
     print("==============================")
     print("1. Add to Leaderboard")
     print("2. Return to Menu")
@@ -170,7 +259,7 @@ def survived_screen(username, time):
 
     choice = input("Select an option (1/2): ")
     if choice == "1":
-        add_to_leaderboard(username, time)
+        add_to_leaderboard(username, time, health)
         print("\nYour time has been added to the leaderboard!")
     elif choice == "2":
         show_menu()
@@ -198,26 +287,6 @@ def lost_screen():
         show_menu()
 
 
-# Quit screen
-def quit_confirmation():
-    print("\n==============================")
-    print("       QUIT THE GAME?")
-    print("==============================")
-    print("Do you really want to quit the game?")
-    print("1. Yes")
-    print("2. No")
-    print("==============================")
-
-    choice = input("Select an option (1/2): ")
-    if choice == "1":
-        print("\nThank you for playing! Goodbye.")
-        exit()
-    elif choice == "2":
-        print("\nReturning to the game...")
-    else:
-        print("\nInvalid choice! Returning to the game...")
-
-
 # Placeholder story
 def start_game_story():
     print("\n==============================")
@@ -227,16 +296,6 @@ def start_game_story():
     print("To survive, you must travel across Europe to collect antidotes.")
     print("But beware, your health will decrease if you fail to collect antidotes in time.")
     print("Complete tasks and overcome random events in each country to get antidotes.")
-    print("Good luck, your journey starts now!")
-    print("==============================")
-
-def start_game_story():
-    print("\n==============================")
-    print("         GAME START")
-    print("==============================")
-    print("You have been infected by the deadly M3615 Virus!")
-    print("To survive, you must travel across Europe to collect antidotes.")
-    print("Select a country on the map to travel to. Complete tasks to collect antidotes.")
     print("Good luck, your journey starts now!")
     print("==============================")
 
@@ -290,9 +349,6 @@ def main_game():
     if not user_name:
         return
 
-    start_game_story()
-    create_random_task()
-
     health = 10
     antidotes_collected = 0
     max_antidotes = 9
@@ -308,47 +364,9 @@ def main_game():
         lost_screen()
 
 
-# Show menu
-def show_menu():
-    while True:
-        print("\n==============================")
-        print("     WELCOME TO M3615 VIRUS")
-        print("==============================")
-        print("1. Start Game")
-        print("2. Leaderboard")
-        print("3. Quit")
-        print("==============================")
-
-        choice = input("Select an option (1/2/3): ")
-
-        if choice == "1":
-            main_game()
-        elif choice == "2":
-            display_leaderboard()
-        elif choice == "3":
-            quit_confirmation()
-        else:
-            print("\nInvalid option! Please choose again.")
-
-
-# Name input screen
-def name_input_screen():
-    print("\n==============================")
-    print("      ENTER YOUR NAME")
-    print("==============================")
-    user_name = input("Enter your name: ").strip()
-
-    if user_name:
-        print(f"\nWelcome, {user_name}! Get ready for the game.")
-        return user_name
-    else:
-        print("\nYou must enter a name to continue!")
-        return None
-
 
 if __name__ == "__main__":
     show_menu()
-
 
 
 
