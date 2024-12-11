@@ -1,0 +1,111 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #1e3c72, #2a5298);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+h1, h2 {
+    font-family: 'Trebuchet MS', sans-serif;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #edece8;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Nappulat */
+button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 10px 0;
+    color: #fff;
+    background: #4a8ed1;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px #2572bd;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: #4a8ed1;
+    box-shadow: 0 2px #2572bd;
+}
+
+button:active {
+    background: #4a8ed1;
+    box-shadow: 0 1px #2572bd;
+    transform: translateY(2px);
+}
+
+/* Näkymien ulkoasu */
+.view {
+    display: none;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.view.active {
+    display: block;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Syöttökenttä */
+input[type="text"] {
+    padding: 10px;
+    margin: 10px 0;
+    width: calc(100% - 20px);
+    border: 2px solid #ddddda;
+    border-radius: 5px;
+    background: #172e57;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Luettelot */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    padding: 10px;
+    margin: 5px 0;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+ul li:hover {
+    background: rgba(255, 255, 255, 0.4);
+    color: #000;
+}
+
+/* Animaatiot */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
