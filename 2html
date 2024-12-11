@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adventure Game</title>
+    <link rel="stylesheet" href="t.css">
+</head>
+<body>
+    <!-- Menu Section -->
+    <div id="menu-section">
+        <button id="startBtn" class="btn">Start Game</button>
+        <button id="leaderboardBtn" class="btn">Leaderboard</button>
+        <button id="quitBtn" class="btn">Quit Game</button>
+    </div>
+
+    <!-- Leaderboard Section -->
+    <div id="leaderboard-section" style="display: none;">
+        <h2>Leaderboard</h2>
+        <ul id="leaderboard-list"></ul>
+        <button id="backToMenuBtn">Back to Menu</button>
+    </div>
+
+    <!-- Name Entry Section -->
+    <div id="name-entry-section" style="display: none;">
+        <label for="playerName">Enter your name:</label>
+        <input type="text" id="playerName" placeholder="Your name here">
+        <button id="submitNameBtn">Submit</button>
+    </div>
+
+    <!-- Cockpit Section -->
+    <div id="cockpit-section" style="display: none;">
+        <h2>Welcome to the Cockpit</h2>
+        <button id="mapBtn" class="btn">Map</button>
+    </div>
+
+    <!-- Map Section -->
+    <div id="map-section" style="display: none;">
+        <h3>Select a Country</h3>
+        <ul id="country-list">
+            <!-- 20 Placeholder Country Buttons -->
+        </ul>
+        <button id="backToCockpitBtn">Back</button>
+    </div>
+
+    <!-- Country Event/Task Section -->
+    <div id="country-event-section" style="display: none;">
+        <h3 id="event-title">Country Event/Task</h3>
+        <p id="event-description">Description goes here.</p>
+        <button id="backToMapBtn">Back to Map</button>
+        <button id="continueBtn">Continue</button> <!-- Continue button -->
+        <div id="taskOrEventDisplay"></div> <!-- Task or Event display -->
+    </div>
+
+    <script src="t.js"></script>
+</body>
+</html>
