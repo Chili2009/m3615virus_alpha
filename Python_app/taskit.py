@@ -1,12 +1,10 @@
 import random
-
 player = {
     "name": "...",
     "health": 0,
     "current_location": "FI",
     "collected_antidotes": []
 }
-
 
 # 1 task
 def find_clue_on_board():
@@ -24,7 +22,6 @@ def find_clue_on_board():
     else:
         print(f"Wrong! The correct code was '{correct_code}'. You missed the antidote.")
         return False
-
 
 # 2 antidote
 def help_an_airport_mechanic():
