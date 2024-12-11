@@ -1,0 +1,128 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const menuSection = document.getElementById('menu-section');
+    const nameEntrySection = document.getElementById('name-entry-section');
+    const cockpitSection = document.getElementById('cockpit-section');
+    const mapSection = document.getElementById('map-section');
+    const countryEventSection = document.getElementById('country-event-section');
+    const leaderboardSection = document.getElementById('leaderboard-section');
+
+    const startBtn = document.getElementById('startBtn');
+    const submitNameBtn = document.getElementById('submitNameBtn');
+    const quitBtn = document.getElementById('quitBtn');
+    const leaderboardBtn = document.getElementById('leaderboardBtn');
+    const backToMenuBtn = document.getElementById('backToMenuBtn');
+    const mapBtn = document.getElementById('mapBtn');
+    const backToCockpitBtn = document.getElementById('backToCockpitBtn');
+    const backToMapBtn = document.getElementById('backToMapBtn');
+    const countryList = document.getElementById('country-list');
+    const eventTitle = document.getElementById('event-title');
+    const eventDescription = document.getElementById('event-description');
+    const continueBtn = document.getElementById('continueBtn');
+    const taskOrEventDisplay = document.getElementById('taskOrEventDisplay');
+
+    let playerName = '';
+
+    // Start Game
+    startBtn.addEventListener('click', () => {
+        menuSection.style.display = 'none';
+        nameEntrySection.style.display = 'block';
+    });
+
+    document.getElementById('backToMenuBtn').addEventListener('click', () => {
+        leaderboardSection.style.display = 'none';
+        menuSection.style.display = 'block';
+    });
+
+    submitNameBtn.addEventListener('click', () => {
+        playerName = document.getElementById('playerName').value.trim();
+        if (playerName) {
+            nameEntrySection.style.display = 'none';
+            cockpitSection.style.display = 'block';
+        } else {
+            alert('Please enter your name.');
+        }
+    });
+
+    leaderboardBtn.addEventListener('click', () => {
+        menuSection.style.display = 'none';
+        leaderboardSection.style.display = 'block';
+        showLeaderboard();
+    });
+
+    function showLeaderboard() {
+        fetch('http://127.0.0.1:5000/api/leaderboard')
+            .then(response => response.json())
+            .then(data => {
+                const leaderboardList = document.getElementById('leaderboard-list');
+                leaderboardList.innerHTML = ''; // Clear existing leaderboard
+                
+                data.forEach(player => {
+                    const li = document.createElement('li');
+                    li.textContent = `${player.username}: ${player.score}`;
+                    leaderboardList.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching leaderboard:', error);
+            });
+    }
+
+    // Open Map
+    mapBtn.addEventListener('click', () => {
+        cockpitSection.style.display = 'none';
+        mapSection.style.display = 'block';
+        populateCountryList();
+    });
+
+    // Back to Cockpit
+    backToCockpitBtn.addEventListener('click', () => {
+        mapSection.style.display = 'none';
+        cockpitSection.style.display = 'block';
+    });
+
+    // Back to Map
+    backToMapBtn.addEventListener('click', () => {
+        countryEventSection.style.display = 'none';
+        mapSection.style.display = 'block';
+    });
+
+    // Populate country list
+    function populateCountryList() {
+        const countries = Array.from({ length: 20 }, (_, i) => `Country ${i + 1}`);
+        countryList.innerHTML = '';
+        countries.forEach(country => {
+            const li = document.createElement('li');
+            li.textContent = country;
+            li.className = 'country-btn';
+            li.addEventListener('click', () => openCountryEvent(country));
+            countryList.appendChild(li);
+        });
+    }
+
+    // Show the placeholder text when a country is selected
+    function openCountryEvent(country) {
+        mapSection.style.display = 'none';
+        countryEventSection.style.display = 'block';
+        eventTitle.textContent = `You have selected ${country}`;
+        eventDescription.textContent = 'You land the plane safely. Time to go find those antidotes!';
+
+        continueBtn.style.display = 'inline-block'; // Show the continue button
+    }
+
+   continueBtn.addEventListener('click', () => {
+    fetch('http://5000/api/random_event_or_task')  // Flask API URL
+        .then(response => response.json())
+        .then(data => {
+            taskOrEventDisplay.innerHTML = `
+                <h2>${data.name}</h2>
+                <p>${data.description}</p>
+            `;
+        })
+        .catch(error => {
+            console.error('Error fetching task/event:', error);
+        });
+
+    // Hide the continue button once task/event is loaded
+    continueBtn.style.display = 'none';
+});
+});
