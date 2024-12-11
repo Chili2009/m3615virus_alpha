@@ -1,8 +1,6 @@
 import random
 import mysql.connector
-import events
-import taskit
-
+import json
 from Python_app.taskit import find_clue_on_board, help_an_airport_mechanic, solve_a_broken_luggage_machine, \
     participate_in_a_quiz, help_a_lost_child, retrieve_lost_passenger_documents, navigate_power_outage, \
     find_hidden_message, candy_deal_task
@@ -34,6 +32,15 @@ LIMIT 20;"""
     cursor.execute(sql)
     results = cursor.fetchall()
     return results
+
+
+
+
+
+
+
+
+
 
 
 # Get all goals
@@ -85,6 +92,12 @@ def tasks():
     return results
 
 
+
+
+
+
+
+
 # Create a new game
 def create_game(username):
     health_bar = 10
@@ -99,53 +112,57 @@ def create_game(username):
     cursor.execute(sql, data)
     conn.commit()
 
+completed_tasks = set()
+completed_events = set()
 
 def create_random_task():
-    tasks = {
-        1: find_clue_on_board,
-        2: help_an_airport_mechanic,
-        3: solve_a_broken_luggage_machine,
-        4: participate_in_a_quiz,
-        5: help_a_lost_child,
-        6: retrieve_lost_passenger_documents,
-        7: navigate_power_outage,
-        8: find_hidden_message,
-        10: candy_deal_task
-    }
-    previous_tasks = []
-    random_task = random.randint(1, 10)
-    while random_task in previous_tasks:
-        random_task = random.randint(1, 10)
-    previous_tasks.append(random_task)
-    result = tasks[random_task]()
-    return result
+    global completed_tasks
+    all_tasks = [
+        find_clue_on_board, help_an_airport_mechanic, solve_a_broken_luggage_machine,
+        participate_in_a_quiz, help_a_lost_child, retrieve_lost_passenger_documents,
+        navigate_power_outage, find_hidden_message, candy_deal_task
+    ]
+
+    remaining_tasks = [task for task in all_tasks if task.__name__ not in completed_tasks]
+    if not remaining_tasks:
+        print("No more tasks available!")
+        return None
+
+    task = random.choice(remaining_tasks)
+    completed_tasks.add(task.__name__)
+    return task()
+
 
 
 def create_random_event():
-    event = {
-        1: apple_offer,
-        2: wallet_discovery,
-        3: free_coffee_offer,
-        4: storm_alert,
-        5: outfit_compliment
-    }
-    previous_events = []
-    random_event = random.randint(1, 5)
-    while random_event in previous_events:
-        random_event = random.randint(1, 5)
-    previous_events.append(random_event)
-    result = event[random_event]()
-    return event
+    global completed_events
+    all_events = [
+        apple_offer, wallet_discovery, free_coffee_offer, storm_alert, outfit_compliment
+    ]
+
+    remaining_events = [event for event in all_events if event.__name__ not in completed_events]
+    if not remaining_events:
+        print("No more events available!")
+        return None
+
+    event = random.choice(remaining_events)
+    completed_events.add(event.__name__)
+    return event()
 
 
-def travel(airport_id):
-    task_event = random.randint(1, 3)
-    if task_event == 1:
-        task = create_random_task()
-    if task_event == 2:
-        task = create_random_event()
+def travel():
+    outcomes = ["task"] * 9 + ["event"] * 5 + ["nothing"] * 6
+    outcome = random.choice(outcomes)
+
+    if outcome == "task":
+        return create_random_task()
+    elif outcome == "event":
+        return create_random_event()
     else:
-        task = None
+        print("Nothing happened during this travel.")
+        return None
+
+
 
 # Add player to leaderboard
 def add_to_leaderboard(username, time, health):
@@ -154,6 +171,24 @@ def add_to_leaderboard(username, time, health):
     cursor = conn.cursor()
     cursor.execute(sql, data)
     conn.commit()
+
+
+
+def update_player_progress(player_id, health, visited_countries, antidotes_collected):
+    sql = """
+    UPDATE player
+    SET healthbar = %s,
+        countries_visited = JSON_ARRAY_APPEND(countries_visited, '$', CAST(%s AS CHAR)),
+        collected_antidotes = %s
+    WHERE player_id = %s
+    """
+    data = (health, json.dumps(visited_countries), json.dumps(antidotes_collected), player_id)
+    cursor = conn.cursor()
+    cursor.execute(sql, data)
+    conn.commit()
+
+
+
 
 
 
@@ -288,7 +323,7 @@ def lost_screen():
 
 
 # Placeholder story
-def start_game_story():
+def start_game_story(player_id):
     print("\n==============================")
     print("         GAME START")
     print("==============================")
@@ -300,48 +335,50 @@ def start_game_story():
     print("==============================")
 
     airports = get_airport()
-    visited_countries = set()
     health = 10
     antidotes_collected = 0
-    max_antidotes = 9
+    visited_countries = []
 
-    while health > 0 and antidotes_collected < max_antidotes:
-        print("\nYour current health:", health)
-        print("Antidotes collected:", antidotes_collected, "/", max_antidotes)
-
-        print("\nAvailable airports:")
+    while health > 0 and antidotes_collected < 9 and len(visited_countries) < 9:
+        print(f"\nHealth: {health}, Antidotes Collected: {antidotes_collected}/9")
+        print("Available Airports:")
         for idx, airport in enumerate(airports, start=1):
             print(f"{idx}. {airport['name']} ({airport['iso_country']})")
 
-        choice = input("\nSelect a country to travel to (1-20): ").strip()
-
-        if not choice.isdigit() or int(choice) < 1 or int(choice) > len(airports):
-            print("\nInvalid selection. Please choose a valid number.")
+        choice = input("Select an airport (1-20): ").strip()
+        if not choice.isdigit() or not (1 <= int(choice) <= len(airports)):
+            print("Invalid choice. Try again.")
             continue
 
-        choice = int(choice) - 1
-        selected_airport = airports[choice]
-        country_name = selected_airport['iso_country']
+        selected_airport = airports[int(choice) - 1]
+        country = selected_airport['iso_country']
 
-        if country_name in visited_countries:
-            print("\nYou have already visited this country! Choose another.")
+        if country in visited_countries:
+            print("You have already visited this country. Choose another.")
             continue
 
-        visited_countries.add(country_name)
-        print(f"\nTraveling to {selected_airport['name']} in {country_name}...")
+        visited_countries.append(country)
+        print(f"\nTraveling to {selected_airport['name']} in {country}...")
 
-        task_result = create_random_task()
-        if task_result:
-            print("\nTask completed successfully!")
+        outcome = travel()
+        if outcome == "task":
+            print("You successfully completed a task and gained an antidote!")
             antidotes_collected += 1
+        elif outcome == "event":
+            print("An event occurred during your travel.")
+            # Event outcomes may already update health based on implementation
         else:
-            print("\nTask failed. You lose 1 health point.")
-            health -= 1
+            print("Nothing happened during this visit.")
 
-    if antidotes_collected >= max_antidotes:
-        survived_screen("Player", health * 10 + antidotes_collected)
+        health -= 1  # Deduct health for traveling
+        if health <= 0:
+            print("You have run out of health!")
+
+    if antidotes_collected >= 9:
+        print("\nCongratulations! You collected all antidotes and survived!")
     else:
-        lost_screen()
+        print("\nGame Over. You were unable to collect enough antidotes in time.")
+
 
 # Main game logic
 def main_game():
@@ -352,14 +389,50 @@ def main_game():
     health = 10
     antidotes_collected = 0
     max_antidotes = 9
+    visited_countries = set()
+    airports = get_airport()
 
-    while health > 0 and antidotes_collected < max_antidotes:
+    while health > 0 and antidotes_collected < max_antidotes and len(visited_countries) < 9:
         print(f"\nHealth: {health} | Antidotes Collected: {antidotes_collected}/{max_antidotes}")
-        health -= 1
-        antidotes_collected += 1
+        print("\nAvailable Airports:")
+        for idx, airport in enumerate(airports, start=1):
+            print(f"{idx}. {airport['name']} ({airport['iso_country']})")
+
+        choice = input("\nSelect an airport to travel to (1-20): ").strip()
+        if not choice.isdigit() or not (1 <= int(choice) <= len(airports)):
+            print("Invalid choice. Please try again.")
+            continue
+
+        choice = int(choice) - 1
+        selected_airport = airports[choice]
+        country = selected_airport['iso_country']
+
+        if country in visited_countries:
+            print("You have already visited this country! Choose another.")
+            continue
+
+        visited_countries.add(country)
+        print(f"\nTraveling to {selected_airport['name']} in {country}...")
+
+        # Random outcome: task, event, or nothing
+        outcome = random.choice(["task", "event", "nothing"])
+        if outcome == "task":
+            task_success = create_random_task()
+            if task_success:
+                print("Task completed successfully! You gain an antidote.")
+                antidotes_collected += 1
+            else:
+                print("Task failed. You lose 1 health point.")
+                health -= 1
+        elif outcome == "event":
+            print("An event occurred during your travel.")
+            create_random_event()
+        else:
+            print("Nothing happened during this visit.")
+
 
     if antidotes_collected >= max_antidotes:
-        survived_screen(user_name, health * 10 + antidotes_collected)
+        survived_screen(user_name, antidotes_collected * 10, health)
     else:
         lost_screen()
 
