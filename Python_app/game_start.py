@@ -242,7 +242,6 @@ def display_leaderboard():
         show_menu()
 
 
-
 # Quit screen
 def quit_confirmation():
     print("\n==============================")
