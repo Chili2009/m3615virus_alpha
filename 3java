@@ -1,0 +1,115 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // HTML-elementit
+    const taskSection = document.getElementById('taskSection');
+    const eventSection = document.getElementById('eventSection');
+    const taskContent = document.getElementById('taskContent');
+    const eventContent = document.getElementById('eventContent');
+    const showTaskBtn = document.getElementById('showTaskBtn');
+    const showEventBtn = document.getElementById('showEventBtn');
+
+    const startBtn = document.getElementById('start');
+    const submitNameBtn = document.getElementById('submit-name');
+    const playerNameInput = document.getElementById('playerName');
+    const mapBtn = document.getElementById('map');
+
+    // Tarkistetaan, että tärkeät napit löytyvät
+    if (!startBtn || !submitNameBtn || !playerNameInput || !mapBtn) {
+        console.error('Tärkeät elementit puuttuvat.');
+        return;
+    }
+
+    // Näkymän vaihtaminen
+  const showScreen = (id) => {
+        const screens = document.querySelectorAll('.view');
+        screens.forEach(screen => screen.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    };
+
+    // Peli alkaa - Start-nappi
+    startBtn.addEventListener('click', () => showScreen('nameEntry'));
+
+    // Nimen syöttö ja pelin aloitus - Submit-nappi
+    submitNameBtn.addEventListener('click', () => {
+    const name = playerNameInput.value.trim(); // Hae nimen syöttö
+    if (name) {
+        fetch('http://localhost:63342/api/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name }) // Lähetetään nimi serveriin
+        })
+        .then(response => response.json())
+        .then(() => {
+            // Jos lähetys onnistuu, näytetään Cockpit-näkymä
+            showScreen('cockpit');
+        })
+        .catch((error) => {
+            console.error("Error submitting name:", error);
+            alert("Error submitting name!");
+        });
+    } else {
+        alert('Please enter your name!');
+    }
+    });
+    // Näytetään kartta
+    mapBtn.addEventListener('click', () => {
+        fetch('http://localhost:63342/api/events')
+            .then(response => response.json())
+            .then(data => {
+                eventContent.textContent = `${data[0].name}: ${data[0].effect}`;
+                showScreen('taskEvent');
+            })
+            .catch(error => console.error('Error fetching events:', error));
+    });
+
+    // Näytetään tehtävät
+    showTaskBtn.addEventListener('click', () => {
+        fetch('http://localhost:63342/api/tasks')
+            .then(response => response.json())
+            .then(data => {
+                taskContent.innerHTML = ''; // Tyhjentää vanhan sisällön
+                data.forEach(task => {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.innerHTML = `
+                        <h3>${task.name}</h3>
+                        <p>${task.description}</p>
+                    `;
+                    taskContent.appendChild(taskDiv);
+                });
+                taskSection.style.display = 'block';
+                eventSection.style.display = 'none';
+            })
+            .catch(error => console.error('Error fetching tasks:', error));
+    });
+
+    // Näytetään tapahtumat
+    showEventBtn.addEventListener('click', () => {
+        fetch('http://localhost:63342/api/events')
+            .then(response => response.json())
+            .then(data => {
+                eventContent.innerHTML = data.message;
+                eventSection.style.display = 'block';
+                taskSection.style.display = 'none';
+            })
+            .catch(error => console.error('Error fetching event:', error));
+    });
+
+    // Leaderboardin hakeminen
+    async function fetchLeaderboard() {
+        try {
+            const response = await fetch('http://localhost:63342/api/leaderboard');
+            const data = await response.json();
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = ''; // Tyhjennetään vanha leaderboard
+            data.forEach(entry => {
+                const li = document.createElement('li');
+                li.textContent = `${entry.username}: ${entry.score}`;
+                leaderboardList.appendChild(li);
+            });
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    }
+
+    // Leaderboardin täyttö
+    fetchLeaderboard();
+});
