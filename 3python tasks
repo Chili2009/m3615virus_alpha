@@ -1,0 +1,285 @@
+from flask import Flask, jsonify, request
+import random
+import mysql.connector
+import json
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:63342"}})
+
+
+conn = mysql.connector.connect(
+    host='localhost',
+    port=3306,
+    database='m3615virus_alpha',
+    user='root',
+    password='euch7soo',
+    autocommit=True
+)
+cursor = conn.cursor()
+
+app = Flask(__name__)
+
+tasks = [
+    # Tasks data remains the same...
+]
+
+tasks = [
+    {
+        "id": 1,
+        "name": "Find Clue on Board",
+        "description": "You find a mysterious board in the airport lounge. It has multiple clues written in code. Choose the correct code to find the antidote.",
+        "reward_health": 1,  # Adding reward_health
+        "penalty_health": 0,  # Adding penalty_health
+        "choices": [
+            {"option": "X32YZ", "text": "Choose X32YZ"},
+            {"option": "M3615", "text": "Choose M3615"},
+            {"option": "H2S99", "text": "Choose H2S99"}
+        ],
+        "outcomes": {
+            "M3615": "Correct! The code 'M3615' reveals the antidote location.",
+            "X32YZ": "Wrong! The correct code was 'M3615'. You missed the antidote.",
+            "H2S99": "Wrong! The correct code was 'M3615'. You missed the antidote."
+        }
+    },
+    {
+        "id": 2,
+        "name": "Help an Airport Mechanic",
+        "description": "You notice an airport mechanic struggling to repair an important system. They ask you to help solve a problem before the system overheats. You have 3 attempts to guess the right fix.",
+        "reward_health": 1,  # Adding reward_health
+        "penalty_health": 0,  # Adding penalty_health
+        "choices": [
+            {"option": "1", "text": "Try number 1 to fix the system"},
+            {"option": "2", "text": "Try number 2 to fix the system"},
+            {"option": "3", "text": "Try number 3 to fix the system"},
+            {"option": "4", "text": "Try number 4 to fix the system"},
+            {"option": "5", "text": "Try number 5 to fix the system"}
+        ],
+        "outcomes": {
+            "correct": "You guessed correctly! The mechanic thanks you with an antidote!",
+            "wrong": "Wrong fix. Try again.",
+            "max_attempts": "The correct fix was {correct_fix}. The system fails, and you leave empty-handed."
+        }
+    },
+    {
+        "id": 3,
+        "name": "Solve a Broken Luggage Machine",
+        "description": "The airport's luggage sorting system is malfunctioning. The line is getting longer, and passengers are frustrated. You decide to step in and fix the problem.",
+        "reward_health": 1,  # Adding reward_health
+        "penalty_health": 0,  # Adding penalty_health
+        "choices": [
+            {"option": "1", "text": "Try to fix the mechanical issue"},
+            {"option": "2", "text": "Work on the software issue"},
+            {"option": "3", "text": "Ask the airport staff for help"}
+        ],
+        "outcomes": {
+            "1": "You fix the mechanical issue and the system starts working again. You gain access to an antidote!",
+            "2": "You repair the software and the luggage system operates smoothly. You find a hidden antidote!",
+            "3": "You ask for help, and the staff give you a map with an antidote location."
+        }
+    },
+    {
+        "id": 4,
+        "name": "Participate in a Quiz",
+        "description": "You come across a travel trivia quiz being held at the airport. The winner gets a special prize. You decide to join and answer some questions.",
+        "reward_health": 1,  # Adding reward_health
+        "penalty_health": 0,  # Adding penalty_health
+        "questions": [
+            {
+                "question": "What is the capital of Germany?",
+                "correct_answer": "Berlin",
+                "choices": [
+                    {"option": "Berlin", "text": "Berlin"},
+                    {"option": "Paris", "text": "Paris"},
+                    {"option": "Rome", "text": "Rome"}
+                ]
+            },
+            {
+                "question": "Which country is famous for the Eiffel Tower?",
+                "correct_answer": "France",
+                "choices": [
+                    {"option": "Germany", "text": "Germany"},
+                    {"option": "France", "text": "France"},
+                    {"option": "Spain", "text": "Spain"}
+                ]
+            },
+            {
+                "question": "Where is Megis from?",
+                "correct_answer": "Finland",
+                "choices": [
+                    {"option": "Sweden", "text": "Sweden"},
+                    {"option": "Finland", "text": "Finland"},
+                    {"option": "Norway", "text": "Norway"}
+                ]
+            }
+        ],
+        "outcomes": {
+            "correct": "Correct! You win the prize, which includes an antidote!",
+            "wrong": "Incorrect answer. Better luck next time!"
+        }
+    },
+    {
+        "id": 5,
+        "name": "Help a Lost Child",
+        "description": "A child approaches you at the airport, looking lost and scared. They ask you to help them find their parents. You decide to assist them.",
+        "reward_health": 1,  # Adding reward_health
+        "penalty_health": 0,  # Adding penalty_health
+        "choices": [
+            {"option": "1", "text": "Look in the lost and found section"},
+            {"option": "2", "text": "Look near the gates"},
+            {"option": "3", "text": "Ask airport staff to make an announcement"}
+        ],
+        "outcomes": {
+            "1": "You find the parents in the lost and found section. They give you an antidote in gratitude!",
+            "2": "The parents are waiting in the lounge. They thank you and give you an antidote!",
+            "3": "The staff help make an announcement. The parents come to pick up the child, and they give you an antidote!"
+        }
+    },
+    {
+        "id": 6,
+        "name": "Retrieve Lost Passenger Documents",
+        "description": "A passenger approaches you, looking stressed. They've lost their documents. You decide to help by following a series of clues.",
+        "reward_health": 1,  # Adding reward_health
+        "penalty_health": 0,  # Adding penalty_health
+        "choices": [
+            {"option": "1", "text": "Look in the luggage storage area"},
+            {"option": "2", "text": "Look in the airport lounge"},
+            {"option": "3", "text": "Look in the bathrooms"}
+        ],
+        "outcomes": {
+            "1": "Wrong choice. The documents remain missing.",
+            "2": "You find the documents in the lounge! The passenger rewards you with an antidote.",
+            "3": "Wrong choice. The documents remain missing."
+        }
+    },
+    {
+        "id": 7,
+        "name": "Navigate Power Outage",
+        "description": "The airport experiences a sudden power outage. You must navigate to safety.",
+        "reward_health": 1,  # Adding reward_health
+        "penalty_health": 0,  # Adding penalty_health
+        "choices": [
+            {"option": "1", "text": "Choose the main hallway"},
+            {"option": "2", "text": "Choose the emergency stairs"},
+            {"option": "3", "text": "Choose the lounge"}
+        ],
+        "outcomes": {
+            "1": "You safely navigate through the main hallway and find an antidote!",
+            "2": "You safely navigate through the emergency stairs and find an antidote!",
+            "3": "You safely navigate through the lounge and find an antidote!"
+        }
+    },
+    {
+        "id": 8,
+        "name": "Find Hidden Message",
+        "description": "You overhear a cryptic message being announced in the airport. It might lead to an antidote!",
+        "reward_health": 1,  # Adding reward_health
+        "penalty_health": 0,  # Adding penalty_health
+        "choices": [
+            {"option": "1", "text": "Answer: All of them"},
+            {"option": "2", "text": "Answer: February"},
+            {"option": "3", "text": "Answer: December"}
+        ],
+        "outcomes": {
+            "1": "Correct! The riddle reveals the antidote location.",
+            "2": "Wrong answer. The message remains a mystery.",
+            "3": "Wrong answer. The message remains a mystery."
+        }
+    },
+    {
+        "id": 9,
+        "name": "Pharmacy Backroom Task",
+        "description": "As you sit in the airport café, you overhear two employees whispering: 'There’s an antidote in the pharmacy backroom near Gate 12. It’s hidden with the other experimental meds.' You decide to sneak in to retrieve it.",
+        "reward_health": 1,  # Adding reward_health
+        "penalty_health": 0,  # Adding penalty_health
+        "choices": [
+            {"option": "sneak", "text": "Sneak into the backroom"}
+        ],
+        "outcomes": {
+            "sneak": "You carefully make your way to the pharmacy, avoiding prying eyes. There it is—the antidote! You grab the antidote and quickly leave before anyone notices."
+        }
+    },
+    {
+        "id": 10,
+        "name": "Candy Deal Task",
+        "description": "You are sitting in the airport lounge, and suddenly, you spot something shiny under a bench. It's an antidote! Just as you reach for it, a child rushes over and snatches it away. The child looks at you and says, 'If you want this antidote, you have to buy me candy first! I want the biggest candy bar in the store!'",
+        "reward_health": 1,  # Adding reward_health
+        "penalty_health": 0,  # Adding penalty_health
+        "choices": [
+            {"option": "1", "text": "Agree to buy the candy and go to the store."},
+            {"option": "2", "text": "Refuse and try to take the antidote from the child."},
+            {"option": "3", "text": "Try to convince the child that the antidote is more important than candy."}
+        ],
+        "outcomes": {
+            "1": "You buy the candy, and the child hands you the antidote with a big smile!",
+            "2": "The child refuses to give you the antidote and runs away with it. You lost your chance!",
+            "3": "The child laughs and says, 'No way! Candy is way cooler than that!' Looks like you'll have to buy the candy after all."
+        }
+    }
+]
+
+
+def add_tasks_to_db(tasks):
+    for task in tasks:
+        try:
+            # Set default values if a field is missing
+            task["choices"] = task.get("choices", task.get("questions", []))  # Use questions if choices is missing
+            task["reward_health"] = task.get("reward_health", 0)
+
+            # Check for other required fields (name, description, etc.)
+            if not all(key in task for key in ['id', 'name', 'description', 'penalty_health', 'outcomes']):
+                print(f"Skipping task {task.get('id', 'unknown')} due to missing required fields.")
+                continue
+
+            # Check if the task already exists
+            cursor.execute("SELECT COUNT(*) FROM tasks WHERE tasks_id = %s", (task["id"],))
+            if cursor.fetchone()[0] > 0:
+                print(f"Task with ID {task['id']} already exists. Skipping insertion.")
+                continue
+
+            # Insert the task
+            sql = """
+            INSERT INTO tasks (tasks_id, name, description, reward_health, penalty_health, choices, outcomes)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+            data = (
+                task["id"],
+                task["name"],
+                task["description"],
+                task["reward_health"],
+                task["penalty_health"],
+                json.dumps(task["choices"]),  # Now using "choices", which can come from "questions"
+                json.dumps(task["outcomes"])
+            )
+            cursor.execute(sql, data)
+            print(f"Task {task['id']} inserted successfully.")
+
+        except Exception as e:
+            print(f"Error inserting task {task.get('id', 'unknown')}: {e}")
+    conn.commit()
+
+add_tasks_to_db(tasks)
+
+
+# Hakee kaikki tehtävät
+@app.route('/api/tasks', methods=['GET'])
+def get_tasks():
+    cursor.execute("SELECT * FROM tasks")
+    tasks = cursor.fetchall()
+
+    task_list = []
+    for task in tasks:
+        task_data = {
+            "id": task[0],
+            "name": task[4],
+            "description": task[1],
+            "choices": json.loads(task[5]),  # Choices tulee JSON-muodossa
+            "outcomes": json.loads(task[6])  # Outcomes tulee JSON-muodossa
+        }
+        task_list.append(task_data)
+
+    return jsonify(task_list)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
