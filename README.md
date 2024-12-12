@@ -1,3 +1,5 @@
+![Flight](https://github.com/user-attachments/assets/2cb8d61f-2d23-44a7-8729-1e7459068ce4)
+
 Reetan, Emman ja Mian lentopeli
 
 # Ohjelmisto 2 projektityö
