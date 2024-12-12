@@ -16,7 +16,6 @@ conn = mysql.connector.connect(
     autocommit=True
 )
 
-
 # Select from 20 airports in Europe for the game
 def get_airport():
     sql = """SELECT iso_country, ident, name, type, latitude_deg, longitude_deg
@@ -349,7 +348,6 @@ def main_game():
         if country in visited_countries:
             print("You have already visited this country! Choose another.")
             continue
-
 
         visited_countries.add(country)
         print(f"\nTraveling to {selected_airport['name']} in {country}...")
