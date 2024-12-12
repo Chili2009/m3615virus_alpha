@@ -1,0 +1,154 @@
+const url = 'http://127.0.0.1:3000'; // Define your backend URL
+let game_id, cur_health, cur_countries_visited, cur_antidotes_collected;
+
+// Initialize the game
+function init() {
+    const nameform = document.querySelector("#name-form");
+    if (nameform) {
+        nameform.addEventListener('submit', handleNameSubmission);
+    } else {
+        console.error("Name form not found!");
+    }
+
+    document.querySelector('#start-game').addEventListener('click', showNameInputDialog);
+    document.querySelector('#quit-game').addEventListener('click', quitGame);
+    document.querySelector('#map-button').addEventListener('click', openMapView);
+    document.querySelector('#complete-task-event').addEventListener('click', completeTaskEvent);
+}
+
+// Show the name input dialog
+function showNameInputDialog() {
+    document.querySelector('#nameinput').showModal();
+    document.querySelector('#main-menu').classList.add('hidden');
+}
+
+// Handle name submission and start the game
+async function handleNameSubmission(evt) {
+    evt.preventDefault();
+    document.querySelector("#nameinput").close(); // Close the name input dialog
+    const name = document.querySelector("#name-input").value;
+    document.querySelector("#p_name").innerHTML = "<b>Name: </b>" + name;
+
+    try {
+        const response = await fetch(`${url}/create_game/${name}`);
+        const result = await response.json();
+
+        game_id = result["game_id"];
+        cur_health = result["health"];
+        cur_countries_visited = result["visited_countries"];
+        cur_antidotes_collected = result["antidotes_collected"];
+
+        await updatePlayerProgress(); // Update UI after starting the game
+
+        // Show the cockpit after successfully starting the game
+        document.querySelector('#main-menu').classList.add('hidden'); // Hide the main menu
+        document.querySelector('#cockpit').classList.remove('hidden'); // Show the cockpit
+    } catch (error) {
+        console.error("Error creating game:", error);
+    }
+}
+
+// Update player progress
+async function updatePlayerProgress() {
+    try {
+        const response = await fetch(`${url}/update_player_progress/${game_id}/${cur_health}/${cur_countries_visited}/${cur_antidotes_collected}`);
+        const result = await response.json();
+        cur_health = result["health"];
+        cur_countries_visited = result["visited_countries"];
+        cur_antidotes_collected = result["antidotes_collected"];
+        updateUI();
+    } catch (error) {
+        console.log("Error updating progress:", error);
+    }
+}
+
+// Update the UI with current player stats
+function updateUI() {
+    document.querySelector("#health").innerHTML = `${cur_health}/15`;
+    document.querySelector("#countries").innerHTML = `${cur_countries_visited}/20`;
+    document.querySelector('#antidotes').innerHTML = `${cur_antidotes_collected}/10`;
+}
+function quitGame() {
+    document.querySelector('#cockpit').classList.add('hidden');
+    document.querySelector('#main-menu').classList.remove('hidden');
+}
+
+// Open the map view
+async function openMapView() {
+    document.querySelector('#cockpit').classList.add('hidden');
+    document.querySelector('#map-view').classList.remove('hidden');
+
+    try {
+        const countries = await getCountry();
+        const mapContainer = document.querySelector('#map-container');
+        mapContainer.innerHTML = ''; // Clear previous countries
+
+        countries.forEach(country => {
+            const countryButton = document.createElement('button');
+            countryButton.innerText = country.name;
+            countryButton.addEventListener('click', () => travelToCountry(country.id));
+            mapContainer.appendChild(countryButton);
+        });
+    } catch (error) {
+        console.error("Error fetching countries:", error);
+    }
+}
+
+// Travel to a selected country
+async function travelToCountry(countryId) {
+    try {
+        const response = await fetch(`${url}/travel_to_country/${game_id}/${countryId}`);
+        const result = await response.json();
+
+        if (result.success) {
+            cur_countries_visited++;
+            await updatePlayerProgress();
+            alert(`You have traveled to ${result.country.name}`);
+        } else {
+            alert("Travel failed. Try again later.");
+        }
+    } catch (error) {
+        console.error("Error traveling to country:", error);
+    } finally {
+        document.querySelector('#map-view').classList.add('hidden');
+        document.querySelector('#cockpit').classList.remove('hidden');
+    }
+}
+async function completeTaskEvent() {
+    document.querySelector('#cockpit').classList.add('hidden');
+    document.querySelector('#task-event-view').classList.remove('hidden');
+
+    try {
+        const response = await fetch(`${url}/complete_task/${game_id}`);
+        const result = await response.json();
+
+        if (result.success) {
+            cur_health += result.health_gain; // Adjust health based on the task result
+            cur_antidotes_collected += result.antidote_gain; // Adjust antidotes based on the task result
+            await updatePlayerProgress(); // Update player progress after completing the task
+            alert("Task completed successfully!");
+        } else {
+            alert("Failed to complete the task. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error completing task:", error);
+    } finally {
+        document.querySelector('#task-event-view').classList.add('hidden');
+        document.querySelector('#cockpit').classList.remove('hidden');
+    }
+}
+
+// Fetch the list of countries (this function needs to be defined)
+async function getCountry() {
+    try {
+        const response = await fetch(`${url}/get_countries`);
+        const countries = await response.json();
+        return countries; // Return the list of countries
+    } catch (error) {
+        console.error("Error fetching countries:", error);
+        return []; // Return an empty array in case of error
+    }
+}
+
+// Initialize the game when the document is ready
+document.addEventListener('DOMContentLoaded', init);
