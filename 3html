@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adventure Game</title>
+    <link rel="stylesheet" href="frontend.css">
+    <style>
+        .view { display: none; } /* Piilottaa kaikki näkymät oletuksena */
+        .view.active { display: block; } /* Näyttää vain aktiivisen näkymän */
+        button { margin: 10px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <!-- Main Menu -->
+    <div id="mainMenu" class="view active">
+        <h1>Main Menu</h1>
+        <button id="start">Start Game</button>
+        <button onclick="showView('leaderboard')">Leaderboard</button>
+        <button onclick="alert('Game Quit')">Quit Game</button>
+    </div>
+
+    <!-- Name Entry -->
+    <div id="nameEntry" class="view">
+    <h1>Enter Your Name</h1>
+    <label for="playerName"></label><input type="text" id="playerName" placeholder="Your name here">
+    <button id="submit-name">Submit</button>
+    <button onclick="showView('mainMenu')">Back to Menu</button>
+</div>
+
+    <!-- Cockpit -->
+    <div id="cockpit" class="view">
+        <h1>Cockpit</h1>
+        <button onclick="showView('map')">Map</button>
+        <button onclick="showView('inventory')">Inventory</button>
+        <button onclick="showView('mainMenu')">Back to Menu</button>
+    </div>
+
+    <!-- Map -->
+    <div id="map" class="view">
+        <h1>Map</h1>
+        <ul id="countryList"></ul>
+        <button onclick="showView('cockpit')">Back to Cockpit</button>
+    </div>
+
+    <!-- Task/Event -->
+    <div id="taskEvent" class="view">
+        <h1>Task/Event</h1>
+        <p id="taskEventDescription">Task/Event details will appear here.</p>
+        <button onclick="showView('map')">Back to Map</button>
+    </div>
+
+    <!-- Inventory -->
+    <div id="inventory" class="view">
+        <h1>Inventory</h1>
+        <ul id="inventoryList"></ul>
+        <button onclick="showView('cockpit')">Back to Cockpit</button>
+    </div>
+
+    <!-- Leaderboard -->
+    <div id="leaderboard" class="view">
+        <h1>Leaderboard</h1>
+        <ul id="leaderboardList"></ul>
+        <button onclick="showView('mainMenu')">Back to Menu</button>
+    </div>
+
+    <script src="frontend.js" defer></script>
+</body>
+</html>
