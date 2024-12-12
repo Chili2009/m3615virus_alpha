@@ -1,115 +1,168 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // HTML-elementit
-    const taskSection = document.getElementById('taskSection');
-    const eventSection = document.getElementById('eventSection');
-    const taskContent = document.getElementById('taskContent');
-    const eventContent = document.getElementById('eventContent');
-    const showTaskBtn = document.getElementById('showTaskBtn');
-    const showEventBtn = document.getElementById('showEventBtn');
+    const menuSection = document.getElementById('menu-section');
+    const nameEntrySection = document.getElementById('name-entry-section');
+    const cockpitSection = document.getElementById('cockpit-section');
+    const mapSection = document.getElementById('map-section');
+    const countryEventSection = document.getElementById('country-event-section');
+    const leaderboardSection = document.getElementById('leaderboard-section');
 
-    const startBtn = document.getElementById('start');
-    const submitNameBtn = document.getElementById('submit-name');
-    const playerNameInput = document.getElementById('playerName');
-    const mapBtn = document.getElementById('map');
+    const startBtn = document.getElementById('startBtn');
+    const submitNameBtn = document.getElementById('submitNameBtn');
+    const quitBtn = document.getElementById('quitBtn');
+    const leaderboardBtn = document.getElementById('leaderboardBtn');
+    const backToMenuBtn = document.getElementById('backToMenuBtn');
+    const mapBtn = document.getElementById('mapBtn');
+    const backToCockpitBtn = document.getElementById('backToCockpitBtn');
+    const backToMapBtn = document.getElementById('backToMapBtn');
+    const countryList = document.getElementById('country-list');
+    const eventTitle = document.getElementById('event-title');
+    const eventDescription = document.getElementById('event-description');
+    const continueBtn = document.getElementById('continueBtn');
+    const taskOrEventDisplay = document.getElementById('taskOrEventDisplay');
+    const url = 'http://127.0.0.1:3000/'
 
-    // Tarkistetaan, että tärkeät napit löytyvät
-    if (!startBtn || !submitNameBtn || !playerNameInput || !mapBtn) {
-        console.error('Tärkeät elementit puuttuvat.');
-        return;
-    }
+    let playerName = '';
 
-    // Näkymän vaihtaminen
-  const showScreen = (id) => {
-        const screens = document.querySelectorAll('.view');
-        screens.forEach(screen => screen.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    };
+    // Start Game
+    startBtn.addEventListener('click', () => {
+        menuSection.style.display = 'none';
+        nameEntrySection.style.display = 'block';
+    });
 
-    // Peli alkaa - Start-nappi
-    startBtn.addEventListener('click', () => showScreen('nameEntry'));
+    document.getElementById('backToMenuBtn').addEventListener('click', () => {
+        leaderboardSection.style.display = 'none';
+        menuSection.style.display = 'block';
+    });
 
-    // Nimen syöttö ja pelin aloitus - Submit-nappi
     submitNameBtn.addEventListener('click', () => {
-    const name = playerNameInput.value.trim(); // Hae nimen syöttö
-    if (name) {
-        fetch('http://localhost:63342/api/start', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name }) // Lähetetään nimi serveriin
-        })
-        .then(response => response.json())
-        .then(() => {
-            // Jos lähetys onnistuu, näytetään Cockpit-näkymä
-            showScreen('cockpit');
-        })
-        .catch((error) => {
-            console.error("Error submitting name:", error);
-            alert("Error submitting name!");
-        });
-    } else {
-        alert('Please enter your name!');
-    }
-    });
-    // Näytetään kartta
-    mapBtn.addEventListener('click', () => {
-        fetch('http://localhost:63342/api/events')
-            .then(response => response.json())
-            .then(data => {
-                eventContent.textContent = `${data[0].name}: ${data[0].effect}`;
-                showScreen('taskEvent');
-            })
-            .catch(error => console.error('Error fetching events:', error));
-    });
-
-    // Näytetään tehtävät
-    showTaskBtn.addEventListener('click', () => {
-        fetch('http://localhost:63342/api/tasks')
-            .then(response => response.json())
-            .then(data => {
-                taskContent.innerHTML = ''; // Tyhjentää vanhan sisällön
-                data.forEach(task => {
-                    const taskDiv = document.createElement('div');
-                    taskDiv.innerHTML = `
-                        <h3>${task.name}</h3>
-                        <p>${task.description}</p>
-                    `;
-                    taskContent.appendChild(taskDiv);
-                });
-                taskSection.style.display = 'block';
-                eventSection.style.display = 'none';
-            })
-            .catch(error => console.error('Error fetching tasks:', error));
-    });
-
-    // Näytetään tapahtumat
-    showEventBtn.addEventListener('click', () => {
-        fetch('http://localhost:63342/api/events')
-            .then(response => response.json())
-            .then(data => {
-                eventContent.innerHTML = data.message;
-                eventSection.style.display = 'block';
-                taskSection.style.display = 'none';
-            })
-            .catch(error => console.error('Error fetching event:', error));
-    });
-
-    // Leaderboardin hakeminen
-    async function fetchLeaderboard() {
-        try {
-            const response = await fetch('http://localhost:63342/api/leaderboard');
-            const data = await response.json();
-            const leaderboardList = document.getElementById('leaderboardList');
-            leaderboardList.innerHTML = ''; // Tyhjennetään vanha leaderboard
-            data.forEach(entry => {
-                const li = document.createElement('li');
-                li.textContent = `${entry.username}: ${entry.score}`;
-                leaderboardList.appendChild(li);
-            });
-        } catch (error) {
-            console.error('There was a problem with the fetch operation:', error);
+        playerName = document.getElementById('playerName').value.trim();
+        if (playerName) {
+            nameEntrySection.style.display = 'none';
+            cockpitSection.style.display = 'block';
+        } else {
+            alert('Please enter your name.');
         }
+    });
+
+    leaderboardBtn.addEventListener('click', () => {
+        menuSection.style.display = 'none';
+        leaderboardSection.style.display = 'block';
+        showLeaderboard();
+    });
+
+    function showLeaderboard() {
+        fetch('http://127.0.0.1:5000/api/leaderboard')
+            .then(response => response.json())
+            .then(data => {
+                const leaderboardList = document.getElementById('leaderboard-list');
+                leaderboardList.innerHTML = ''; // Clear existing leaderboard
+
+                data.forEach(player => {
+                    const li = document.createElement('li');
+                    li.textContent = `${player.username}: ${player.score}`;
+                    leaderboardList.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching leaderboard:', error);
+            });
     }
 
-    // Leaderboardin täyttö
-    fetchLeaderboard();
+    // Open Map
+    mapBtn.addEventListener('click', () => {
+        cockpitSection.style.display = 'none';
+        mapSection.style.display = 'block';
+        populateCountryList();
+    });
+
+    // Back to Cockpit
+    backToCockpitBtn.addEventListener('click', () => {
+        mapSection.style.display = 'none';
+        cockpitSection.style.display = 'block';
+    });
+
+    // Back to Map
+    backToMapBtn.addEventListener('click', () => {
+        countryEventSection.style.display = 'none';
+        mapSection.style.display = 'block';
+    });
+
+    // Populate country list
+    function populateCountryList() {
+        const countries = Array.from({ length: 20 }, (_, i) => `Country ${i + 1}`);
+        countryList.innerHTML = '';
+        countries.forEach(country => {
+            const li = document.createElement('li');
+            li.textContent = country;
+            li.className = 'country-btn';
+            li.addEventListener('click', () => openCountryEvent(country));
+            countryList.appendChild(li);
+        });
+    }
+
+    let currentEventIndex = 0; // Pitää kirjaa näytettävästä tapahtumasta
+    let events = []; // Haetaan tapahtumat palvelimelta
+
+    // Hae tapahtumat Flask API:sta
+    function fetchEvents() {
+        fetch('http://127.0.0.1:5000/api/events')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch events');
+                }
+                return response.json();
+            })
+            .then(data => {
+                events = data;
+                console.log('Events fetched:', events);
+            })
+            .catch(error => {
+                console.error('Error fetching events:', error);
+            });
+    }
+    // Näytä tapahtuma
+    function showEvent(event) {
+        countryEventSection.style.display = 'block';
+        mapSection.style.display = 'none';
+        eventTitle.textContent = event.name;
+        eventDescription.textContent = event.description;
+
+        // Näytä vaihtoehdot
+        taskOrEventDisplay.innerHTML = ''; // Tyhjennä vanhat vaihtoehdot
+        event.choices.forEach(choice => {
+            const button = document.createElement('button');
+            button.textContent = choice.text;
+            button.className = 'choice-btn';
+            button.addEventListener('click', () => handleChoice(choice.option, event));
+            taskOrEventDisplay.appendChild(button);
+        });
+
+        continueBtn.style.display = 'none'; // Piilota "Jatka"-painike tapahtuman aikana
+    }
+
+    // Käsittele valinta
+    function handleChoice(option, event) {
+        const outcome = option === 'yes' ? 'You chose yes!' : 'You chose no!';
+        alert(`Outcome: ${outcome}`);
+        countryEventSection.style.display = 'none';
+        mapSection.style.display = 'block';
+    }
+
+    // Hae tapahtumat, kun DOM on latautunut
+    fetchEvents();
+
+
+    // Show the placeholder text when a country is selected
+    function openCountryEvent(country) {
+        mapSection.style.display = 'none';
+        countryEventSection.style.display = 'block';
+        eventTitle.textContent = `You have selected ${country}`;
+        eventDescription.textContent = 'You land the plane safely. Time to go find those antidotes!';
+
+        continueBtn.style.display = 'inline-block'; // Show the continue button
+    }
+
+    // Hide the continue button once task/event is loaded
+    continueBtn.style.display = 'none';
+
 });
