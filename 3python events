@@ -1,0 +1,164 @@
+from flask import Flask, jsonify, request
+import random
+import mysql.connector
+import json
+
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:63342"}})
+
+conn = mysql.connector.connect(
+    host='localhost',
+    port=3306,
+    database='m3615virus_alpha',
+    user='root',
+    password='euch7soo',
+    autocommit=True
+)
+
+cursor = conn.cursor()
+
+app = Flask(__name__)
+
+
+events = [
+    {
+        "id": 1,
+        "name": "Apple Offer",
+        "description": "An elderly woman offers you a delicious-looking apple. Do you trust her enough to accept it?",
+        "choices": [
+            {"option": "yes", "text": "Accept the apple"},
+            {"option": "no", "text": "Decline the apple"}
+        ],
+        "outcomes": {
+            "yes": "After eating the apple, you feel refreshed and full of energy.",
+            "no": "You politely decline the apple. Nothing changes."
+        },
+        "health_impact": {
+            "yes": 1,
+            "no": 0
+        }
+    },
+    {
+        "id": 2,
+        "name": "Wallet Discovery",
+        "description": "You find a wallet near a vending machine. Should you investigate?",
+        "choices": [
+            {"option": "yes", "text": "Pick up the wallet"},
+            {"option": "no", "text": "Ignore the wallet"}
+        ],
+        "outcomes": {
+            "yes": "You return the wallet to its owner, who rewards you with gratitude and a snack.",
+            "no": "You ignore the wallet and move on. Nothing changes."
+        },
+        "health_impact": {
+            "yes": 1,
+            "no": 0
+        }
+    },
+    {
+        "id": 3,
+        "name": "Free Coffee Offer",
+        "description": "A staff member offers you a free cup of coffee. Would you like to accept it?",
+        "choices": [
+            {"option": "yes", "text": "Accept the coffee"},
+            {"option": "no", "text": "Decline the coffee"}
+        ],
+        "outcomes": {
+            "yes": "The coffee is energizing and warms you up, making you feel great.",
+            "no": "You politely decline the coffee. Nothing changes."
+        },
+        "health_impact": {
+            "yes": 1,
+            "no": 0
+        }
+    },
+    {
+        "id": 4,
+        "name": "Storm Alert",
+        "description": "A storm is coming, and it’s unsafe to travel for the next 2 hours. What do you choose to do?",
+        "choices": [
+            {"option": "yes", "text": "Wait for the storm to pass"},
+            {"option": "no", "text": "Ignore the storm and keep traveling"}
+        ],
+        "outcomes": {
+            "yes": "You wait for the storm to pass. You take a little nap, boosting your energy.",
+            "no": "You decide to travel anyway. You get lost, causing a delay and health loss."
+        },
+        "health_impact": {
+            "yes": 1,
+            "no": -1
+        }
+    },
+    {
+        "id": 5,
+        "name": "Outfit Compliment",
+        "description": "Someone compliments your outfit. How do you respond?",
+        "choices": [
+            {"option": "yes", "text": "Respond positively"},
+            {"option": "no", "text": "Ignore or respond negatively"}
+        ],
+        "outcomes": {
+            "yes": "You feel great and thank the person, returning the compliment.",
+            "no": "You feel uncomfortable and walk away."
+        },
+        "health_impact": {
+            "yes": 1,
+            "no": -1
+        }
+    }
+]
+
+
+def add_events_to_db(events):
+    for event in events:
+        try:
+            # Check if the event already exists by unique ID
+            cursor.execute("SELECT COUNT(*) FROM events WHERE id = %s", (event["id"],))
+            if cursor.fetchone()[0] > 0:
+                print(f"Event with ID {event['id']} already exists. Skipping insertion.")
+                continue  # Skip inserting this event
+
+            # Insert the event data into the database
+            sql = """
+            INSERT INTO events (name, description, choices, outcomes, health_impact)
+            VALUES (%s, %s, %s, %s, %s)
+            """
+            data = (
+                event["name"],
+                event["description"],
+                json.dumps(event["choices"]),  # Ensure choices is stored as a string
+                json.dumps(event["outcomes"]),  # Ensure outcomes is stored as a string
+                json.dumps(event["health_impact"])  # Ensure health_impact is stored as a string
+            )
+            cursor.execute(sql, data)
+
+        except mysql.connector.Error as err:
+            print(f"Error inserting event {event['id']}: {err}")
+
+add_events_to_db(events)
+
+
+# Hakee kaikki tapahtumat
+@app.route('/api/events', methods=['GET'])
+def get_events():
+    cursor.execute("SELECT * FROM events")
+    events = cursor.fetchall()
+
+    event_list = []
+    for event in events:
+        event_data = {
+            "id": event[0],
+            "name": event[1],
+            "description": event[2],
+            "choices": json.loads(event[3]),  # Choices tulee JSON-muodossa
+            "outcomes": json.loads(event[4]),  # Outcomes tulee JSON-muodossa
+            "health_impact": json.loads(event[5])  # Health_impact tulee JSON-muodossa
+        }
+        event_list.append(event_data)
+
+    return jsonify(event_list)
+
+if __name__ == '__main__':
+    app.run(debug=True)
