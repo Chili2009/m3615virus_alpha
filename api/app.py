@@ -23,6 +23,33 @@ def get_airports():
     ]
     return jsonify(airports)
 
+@app.route("/travel", methods=["POST"])
+def travel():
+    outcomes = (
+        ["task"] * 10 +  # 10 tasks
+        ["event"] * 5 +  # 5 events
+        ["nothing"] * 5  # 5 "nothing" outcomes
+    )
+    outcome = random.choice(outcomes)  # Randomly select an outcome
+
+    if outcome == "task":
+        tasks = [
+            "Find a missing item", "Assist a fellow traveler", "Fix a luggage issue",
+            "Translate a document", "Help at the airport counter",
+            "Navigate a map", "Carry an extra bag", "Guide someone to a terminal",
+            "Report a suspicious activity", "Rebook a missed flight"
+        ]
+        task = random.choice(tasks)
+        return jsonify({"outcome": "task", "task": task})
+    elif outcome == "event":
+        events = [
+            "A free snack offer", "A lost wallet found", "Meeting an old friend",
+            "A delayed flight announcement", "An unexpected upgrade"
+        ]
+        event = random.choice(events)
+        return jsonify({"outcome": "event", "event": event})
+    else:
+        return jsonify({"outcome": "nothing", "message": "Nothing happened during the travel."})
 
 @app.route("/perform_task", methods=["POST"])
 def perform_task():

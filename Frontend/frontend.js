@@ -51,18 +51,42 @@ const countries = [
     "Netherlands", "France", "Denmark", "United Kingdom",
     "Ireland", "Iceland"
 ];
+function handleCountryClick(country) {
+    console.log(`Traveling to: ${country}`);
+    fetch(`${apiBaseUrl}/travel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ country }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Travel Outcome:", data); // Debugging
+
+        if (data.outcome === "task") {
+            alert(`You have a task: ${data.task}`);
+        } else if (data.outcome === "event") {
+            alert(`An event occurred: ${data.event}`);
+        } else {
+            alert(data.message); // "Nothing happened during the travel."
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
 
 function populateCountryList() {
-    const countryList = document.getElementById('country-list');
-    countryList.innerHTML = ''; // Clear existing list
+    const countryList = document.getElementById("country-list");
+    countryList.innerHTML = ""; // Clear existing list
 
     countries.forEach(country => {
-        const listItem = document.createElement('li');
+        const listItem = document.createElement("li");
         listItem.textContent = country;
-        listItem.className = 'country-item';
+        listItem.className = "country-item";
+
+        listItem.addEventListener("click", () => handleCountryClick(country)); // Attach click event
         countryList.appendChild(listItem);
     });
 }
+
 function showFlightTitle() {
     document.getElementById('flight-title').style.display = 'block';
     populateCountryList();
