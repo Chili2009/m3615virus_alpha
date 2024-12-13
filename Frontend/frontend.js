@@ -27,6 +27,27 @@ function submitName() {
     document.getElementById('player-info').innerText = `Player: ${username}`;
 }
 
+// Handle name submission
+function submitName() {
+    const username = document.getElementById('username').value.trim();
+    if (!username) {
+        alert('Please enter your name.');
+        return;
+    }
+    console.log(`Game started with username: ${username}`);
+    document.getElementById('name-entry-modal').style.display = 'none';
+
+    // Show story section
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('story-section').style.display = 'block';
+}
+
+// Proceed to the game area
+function proceedToGame() {
+    document.getElementById('story-section').style.display = 'none';
+    document.getElementById('game-area').style.display = 'block';
+}
+
 // Show the main menu
 function showMenu() {
     document.getElementById('menu').style.display = 'block';

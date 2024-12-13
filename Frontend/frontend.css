@@ -147,6 +147,28 @@ button:focus {
 #name-entry-modal .modal-buttons button:last-child {
     background-color: #f44336;
 }
+/* Story Section */
+#story-section {
+    text-align: center;
+    padding: 20px;
+}
+
+#story-section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#story-section button {
+    background-color: transparent;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    color: #4caf50;
+}
+
+#story-section button:hover {
+    color: #45a049;
+}
 
 /* Leaderboard */
 #leaderboard-table {
