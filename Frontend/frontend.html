@@ -7,56 +7,65 @@
     <link rel="stylesheet" href="frontend.css">
 </head>
 <body>
-<div id="menu">
-    <h1>Welcome to the M3615 Virus Game</h1>
-    <button onclick="showGame()">Start Game</button>
-    <button onclick="showLeaderboard()">Leaderboard</button>
-    <button onclick="showQuitModal()">Quit</button>
-</div>
-<!-- Quit Confirmation  -->
-<div id="quit-modal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <p>DO YOU WANT TO QUIT THE GAME?</p>
-        <div class="modal-buttons">
-            <button onclick="confirmQuit()">Yes, Quit</button>
-            <button onclick="closeModal()">No</button>
+    <div id="app">
+        <!-- Menu -->
+        <div id="menu">
+            <h1>Welcome to the M3615 Virus Game!</h1>
+            <button onclick="showNameModal()">Start Game</button>
+            <button onclick="showLeaderboard()">Leaderboard</button>
+            <button onclick="showQuitModal()">Quit</button>
+        </div>
+
+        <!-- Name Entry Modal -->
+        <div id="name-entry-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <p>YOUR NAME:</p>
+                <input type="text" id="username" placeholder="Name">
+                <div class="modal-buttons">
+                    <button onclick="submitName()">Submit</button>
+                    <button onclick="closeNameModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div id="game-area" style="display: none;">
+            <h2 id="player-info"></h2>
+            <div id="airports"></div>
+            <button onclick="getAirports()">Get Airports</button>
+            <div id="task-result"></div>
+            <button onclick="performTask()">Perform Task</button>
+        </div>
+
+        <!-- Leaderboard Area -->
+        <div id="leaderboard-area" style="display: none;">
+            <h2>Leaderboard</h2>
+            <table id="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Time</th>
+                        <th>Health</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <button onclick="returnToMenu()">Return to Menu</button>
+        </div>
+
+        <!-- Quit Modal -->
+        <div id="quit-modal" class="modal">
+            <div class="modal-content">
+                <p>Do you want to quit the game?</p>
+                <div class="modal-buttons">
+                    <button onclick="confirmQuit()">Yes, Quit</button>
+                    <button onclick="closeModal()">No</button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<div id="game-start" style="display: none;">
-    <label for="username"></label><input type="text" id="username" placeholder="Enter your name">
-    <button onclick="startGame()">Start Game</button>
-</div>
-
-<div id="game-area" style="display: none;">
-    <h2 id="player-info"></h2>
-    <div id="airports"></div>
-    <button onclick="getAirports()">Get Airports</button>
-    <div id="task-result"></div>
-    <button onclick="performTask()">Perform Task</button>
-</div>
-
-
-
-<div id="leaderboard-area" style="display: none;">
-    <h2>Leaderboard</h2>
-    <table id="leaderboard-table">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Time</th>
-            <th>Health</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- Rows will be dynamically generated here -->
-        </tbody>
-    </table>
-    <button onclick="returnToMenu()">Return to Menu</button>
-</div>
-
-
-<script src="frontend.js"></script>
+    <script src="frontend.js"></script>
 </body>
 </html>

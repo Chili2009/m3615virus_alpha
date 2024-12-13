@@ -1,37 +1,33 @@
 const apiBaseUrl = 'http://localhost:5000';
 
-// Start Game
-async function startGame() {
-    const username = document.getElementById('username').value;
-    if (!username) {
-        alert('Please enter a username.');
-        return;
-    }
+// Show the name entry modal
+function showNameModal() {
+    document.getElementById('name-entry-modal').style.display = 'flex';
 
-    try {
-        const response = await fetch(`${apiBaseUrl}/start_game`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username }),
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-            document.getElementById('game-start').style.display = 'none';
-            document.getElementById('game-area').style.display = 'block';
-            document.getElementById('player-info').innerText = `Player: ${username}`;
-        } else {
-            alert(data.error);
-        }
-    } catch (error) {
-        alert('Failed to start the game. Please try again.');
-        console.error(error);
-    }
 }
 
-// Navigation Functions
+// Close the name entry modal
+function closeNameModal() {
+    document.getElementById('name-entry-modal').style.display = 'none';
+}
+
+// Handle name submission
+function submitName() {
+    const username = document.getElementById('username').value.trim();
+    if (!username) {
+        alert('Please enter your name.');
+        return;
+    }
+    console.log(`Game started with username: ${username}`);
+    document.getElementById('name-entry-modal').style.display = 'none';
+
+    // Proceed to the game area
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('game-area').style.display = 'block';
+    document.getElementById('player-info').innerText = `Player: ${username}`;
+}
+
+// Show the main menu
 function showMenu() {
     document.getElementById('menu').style.display = 'block';
     document.getElementById('game-start').style.display = 'none';
@@ -39,58 +35,7 @@ function showMenu() {
     document.getElementById('leaderboard-area').style.display = 'none';
 }
 
-function showGame() {
-    document.getElementById('menu').style.display = 'none';
-    document.getElementById('game-start').style.display = 'block';
-}
-
-function returnToMenu() {
-    showMenu();
-}
-
-// Name Entry Modal
-function showNameModal() {
-    document.getElementById('name-modal').style.display = 'flex';
-}
-
-function closeNameModal() {
-    document.getElementById('name-modal').style.display = 'none';
-}
-
-async function submitNameAndStart() {
-    const username = document.getElementById('username').value;
-    if (!username) {
-        alert('Please enter your name.');
-        return;
-    }
-
-    console.log(`Game started with username: ${username}`);
-
-    try {
-        const response = await fetch(`${apiBaseUrl}/start_game`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username }),
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-            closeNameModal();
-            document.getElementById('game-start').style.display = 'none';
-            document.getElementById('game-area').style.display = 'block';
-            document.getElementById('player-info').innerText = `Player: ${username}`;
-        } else {
-            alert(data.error);
-        }
-    } catch (error) {
-        alert('Failed to start the game. Please try again.');
-        console.error(error);
-    }
-}
-
-// Quit Modal
+// Quit Modal Functions
 function showQuitModal() {
     document.getElementById('quit-modal').style.display = 'flex';
 }
@@ -100,11 +45,11 @@ function closeModal() {
 }
 
 function confirmQuit() {
-    alert("Thanks for playing!");
+    alert('Thanks for playing!');
     window.location.href = '/';
 }
 
-// Fetch Data Functions
+// Fetch and Display Airports
 async function getAirports() {
     try {
         const response = await fetch(`${apiBaseUrl}/get_airports`);
@@ -114,7 +59,6 @@ async function getAirports() {
             const airportList = data.map(
                 airport => `<li>${airport.name} (${airport.iso_country})</li>`
             ).join('');
-
             document.getElementById('airports').innerHTML = `<ul>${airportList}</ul>`;
         } else {
             alert('Failed to fetch airports.');
@@ -125,6 +69,7 @@ async function getAirports() {
     }
 }
 
+// Perform a Task in the Game
 async function performTask() {
     try {
         const response = await fetch(`${apiBaseUrl}/perform_task`, {
@@ -146,6 +91,7 @@ async function performTask() {
     }
 }
 
+// Fetch and Display Leaderboard
 async function showLeaderboard() {
     try {
         const response = await fetch(`${apiBaseUrl}/leaderboard`);
@@ -183,4 +129,8 @@ async function showLeaderboard() {
         alert('Error fetching leaderboard.');
         console.error(error);
     }
+}
+function returnToMenu() {
+    document.getElementById('menu').style.display = 'block';
+    document.getElementById('leaderboard-area').style.display = 'none';
 }
