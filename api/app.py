@@ -26,6 +26,14 @@ def perform_task():
     result = random.choice(["success", "failure"])
     return jsonify({"task": selected_task, "result": result})
 
+@app.route("/leaderboard", methods=["GET"])
+def leaderboard():
+    # Simulate data from database
+    leaderboard_data = [
+        {"username": "Player1", "time": 120, "health_bar": 10},
+    ]
+    return jsonify(leaderboard_data)
+
 @app.route("/")
 def home():
     return "<h1>Welcome to the M3615 Virus Flight Game API!</h1><p>Use the available endpoints to interact with the game.</p>"
