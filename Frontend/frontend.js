@@ -48,6 +48,16 @@ function proceedToGame() {
     document.getElementById('game-area').style.display = 'block';
 }
 
+function proceedToDestination() {
+    document.getElementById('story-section').style.display = 'none';
+    document.getElementById('choose-destination').style.display = 'block';
+
+}
+
+function proceedToGame() {
+    document.getElementById('choose-destination').style.display = 'none';
+    document.getElementById('game-area').style.display = 'block';
+}
 // Show the main menu
 function showMenu() {
     document.getElementById('menu').style.display = 'block';

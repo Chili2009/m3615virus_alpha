@@ -170,6 +170,45 @@ button:focus {
     color: #45a049;
 }
 
+/* Choose Destination Section */
+#choose-destination {
+    text-align: center;
+    padding: 20px;
+}
+
+#choose-destination .cockpit {
+    position: relative;
+    background-color: #f4f4f4;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    padding: 40px;
+    width: 80%;
+    margin: 0 auto;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#choose-destination h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#choose-destination .arrow-down {
+    font-size: 40px;
+    color: #4caf50;
+    margin-top: 10px;
+}
+
+#choose-destination .arrow-down:hover {
+    color: #45a049;
+}
+
 /* Leaderboard */
 #leaderboard-table {
     width: 100%;
