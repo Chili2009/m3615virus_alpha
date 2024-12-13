@@ -28,7 +28,7 @@ def perform_task():
 
 @app.route("/")
 def home():
-    return "<h1>Welcome to the Flight Game API!</h1><p>Use the available endpoints to interact with the game.</p>"
+    return "<h1>Welcome to the M3615 Virus Flight Game API!</h1><p>Use the available endpoints to interact with the game.</p>"
 
 if __name__ == "__main__":
     app.run(debug=True)
