@@ -230,6 +230,29 @@ button:focus {
     font-weight: bold;
 }
 
+#country-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px auto;
+    text-align: center;
+    font-size: 18px;
+    max-height: 300px; /* Adds scrolling if needed */
+    overflow-y: auto;
+    width: 80%;
+}
+
+#country-list li {
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+#country-list li:hover {
+    background-color: #e0f7fa;
+}
+
 
 #stats-display {
     margin-top: 20px;

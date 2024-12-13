@@ -44,11 +44,35 @@ function proceedToDestination() {
     document.getElementById('stats-display').style.display = 'none';
 }
 
+const countries = [
+    "Finland", "Sweden", "Norway", "Estonia", "Latvia",
+    "Lithuania", "Poland", "Slovakia", "Hungary", "Austria",
+    "Germany", "Switzerland", "Czech Republic", "Belgium",
+    "Netherlands", "France", "Denmark", "United Kingdom",
+    "Ireland", "Iceland"
+];
 
+function populateCountryList() {
+    const countryList = document.getElementById('country-list');
+    countryList.innerHTML = ''; // Clear existing list
+
+    countries.forEach(country => {
+        const listItem = document.createElement('li');
+        listItem.textContent = country;
+        listItem.className = 'country-item';
+        countryList.appendChild(listItem);
+    });
+}
+function showFlightTitle() {
+    document.getElementById('flight-title').style.display = 'block';
+    populateCountryList();
+}
 // Proceed to the game area
 function proceedToGame() {
     document.getElementById('choose-destination').style.display = 'none';
     document.getElementById('game-area').style.display = 'block';
+
+    showFlightTitle();
 
      // Show the title on the last page
     document.getElementById('flight-title').style.display = 'block';
