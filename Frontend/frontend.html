@@ -7,80 +7,82 @@
     <link rel="stylesheet" href="frontend.css">
 </head>
 <body>
-    <div id="app">
-        <!-- Menu -->
-        <div id="menu">
-            <h1>Welcome to the M3615 Virus Game!</h1>
-            <button onclick="showNameModal()">Start Game</button>
-            <button onclick="showLeaderboard()">Leaderboard</button>
-            <button onclick="showQuitModal()">Quit</button>
-        </div>
-
-        <!-- Name Entry Modal -->
-        <div id="name-entry-modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <p>YOUR NAME:</p>
-                <input type="text" id="username" placeholder="Name">
-                <div class="modal-buttons">
-                    <button onclick="submitName()">Submit</button>
-                    <button onclick="closeNameModal()">Cancel</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Story Section -->
-<div id="story-section" style="display: none;">
-    <h2>Placeholder Story...</h2>
-     <button onclick="proceedToDestination()">&#9658;</button>
-</div>
-
-        <!-- Choose Destination Section -->
-<div id="choose-destination" style="display: none;">
-    <div class="cockpit">
-        <h2>CHOOSE NEXT DESTINATION</h2>
-        <div class="arrow-down">&#8595;</div>
-        <button onclick="proceedToGame()">&#9658;</button>
+<div id="app">
+    <!-- Menu -->
+    <div id="menu">
+        <h1>Welcome to the M3615 Virus Game!</h1>
+        <button onclick="showNameModal()">Start Game</button>
+        <button onclick="showLeaderboard()">Leaderboard</button>
+        <button onclick="showQuitModal()">Quit</button>
     </div>
-</div>
 
-        <!-- Game Area -->
-        <div id="game-area" style="display: none;">
-            <h2 id="player-info"></h2>
-            <div id="airports"></div>
-            <button onclick="getAirports()">Get Airports</button>
-            <div id="task-result"></div>
-            <button onclick="performTask()">Perform Task</button>
-        </div>
-
-        <!-- Leaderboard Area -->
-        <div id="leaderboard-area" style="display: none;">
-            <h2>Leaderboard</h2>
-            <table id="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Player</th>
-                        <th>Time</th>
-                        <th>Health</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-            <button onclick="returnToMenu()">Return to Menu</button>
-        </div>
-
-        <!-- Quit Modal -->
-        <div id="quit-modal" class="modal">
-            <div class="modal-content">
-                <p>Do you want to quit the game?</p>
-                <div class="modal-buttons">
-                    <button onclick="confirmQuit()">Yes, Quit</button>
-                    <button onclick="closeModal()">No</button>
-                </div>
+    <!-- Name Entry Modal -->
+    <div id="name-entry-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <p>YOUR NAME:</p>
+            <input type="text" id="username" placeholder="Name">
+            <div class="modal-buttons">
+                <button onclick="submitName()">Submit</button>
+                <button onclick="closeNameModal()">Cancel</button>
             </div>
         </div>
     </div>
 
-    <script src="frontend.js"></script>
+    <!-- Story Section -->
+    <div id="story-section" style="display: none;">
+        <h2>Placeholder Story...</h2>
+        <button onclick="proceedToDestination()">&#9658;</button>
+    </div>
+
+    <!-- Choose Destination Section -->
+    <div id="choose-destination" style="display: none;">
+        <div class="cockpit">
+            <h2>CHOOSE NEXT DESTINATION</h2>
+            <div class="arrow-down">&#8595;</div>
+            <button onclick="proceedToGame()">&#9658;</button>
+        </div>
+    </div>
+    <div id="stats-display" style="display: none;">
+        <p><strong>Health:</strong> <span id="health-bar">10/10</span></p>
+        <p><strong>Antidotes:</strong> <span id="antidotes-count">0/5</span></p>
+        <p><strong>Visited Countries:</strong> <span id="visited-countries-count">0/9</span></p>
+    </div>
+
+    <!-- Game Area -->
+    <div id="game-area" style="display: none;">
+        <h2 id="player-info"></h2>
+    </div>
+
+    <!-- Leaderboard Area -->
+    <div id="leaderboard-area" style="display: none;">
+        <h2>Leaderboard</h2>
+        <table id="leaderboard-table">
+            <thead>
+            <tr>
+                <th>Player</th>
+                <th>Time</th>
+                <th>Health</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        <button onclick="returnToMenu()">Return to Menu</button>
+    </div>
+
+    <!-- Quit Modal -->
+    <div id="quit-modal" class="modal">
+        <div class="modal-content">
+            <p>Do you want to quit the game?</p>
+            <div class="modal-buttons">
+                <button onclick="confirmQuit()">Yes, Quit</button>
+                <button onclick="closeModal()">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="frontend.js"></script>
 </body>
 </html>

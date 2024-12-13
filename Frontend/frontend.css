@@ -147,6 +147,7 @@ button:focus {
 #name-entry-modal .modal-buttons button:last-child {
     background-color: #f44336;
 }
+
 /* Story Section */
 #story-section {
     text-align: center;
@@ -207,6 +208,22 @@ button:focus {
 
 #choose-destination .arrow-down:hover {
     color: #45a049;
+}
+
+#stats-display {
+    margin-top: 20px;
+    text-align: left;
+    font-size: 16px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+#stats-display p {
+    margin: 5px 0;
 }
 
 /* Leaderboard */

@@ -1,9 +1,14 @@
+// Base API URL
 const apiBaseUrl = 'http://localhost:5000';
+
+// Stats variables
+let health = 10;
+let antidotes = 0;
+let visitedCountries = 0;
 
 // Show the name entry modal
 function showNameModal() {
     document.getElementById('name-entry-modal').style.display = 'flex';
-
 }
 
 // Close the name entry modal
@@ -21,116 +26,53 @@ function submitName() {
     console.log(`Game started with username: ${username}`);
     document.getElementById('name-entry-modal').style.display = 'none';
 
-    // Proceed to the game area
-    document.getElementById('menu').style.display = 'none';
-    document.getElementById('game-area').style.display = 'block';
-    document.getElementById('player-info').innerText = `Player: ${username}`;
-}
-
-// Handle name submission
-function submitName() {
-    const username = document.getElementById('username').value.trim();
-    if (!username) {
-        alert('Please enter your name.');
-        return;
-    }
-    console.log(`Game started with username: ${username}`);
-    document.getElementById('name-entry-modal').style.display = 'none';
-
     // Show story section
     document.getElementById('menu').style.display = 'none';
     document.getElementById('story-section').style.display = 'block';
+
+    // Hide stats during the story section
+    document.getElementById('stats-display').style.display = 'none';
 }
 
-// Proceed to the game area
-function proceedToGame() {
-    document.getElementById('story-section').style.display = 'none';
-    document.getElementById('game-area').style.display = 'block';
-}
-
+// Proceed to the destination selection
 function proceedToDestination() {
     document.getElementById('story-section').style.display = 'none';
     document.getElementById('choose-destination').style.display = 'block';
 
+    // Hide stats during the choose destination phase
+    document.getElementById('stats-display').style.display = 'none';
 }
 
+// Proceed to the game area
 function proceedToGame() {
     document.getElementById('choose-destination').style.display = 'none';
     document.getElementById('game-area').style.display = 'block';
+
+    // Show stats only in the game area
+    document.getElementById('stats-display').style.display = 'block';
+    updateStats();
 }
+
 // Show the main menu
 function showMenu() {
     document.getElementById('menu').style.display = 'block';
-    document.getElementById('game-start').style.display = 'none';
+    document.getElementById('story-section').style.display = 'none';
+    document.getElementById('choose-destination').style.display = 'none';
     document.getElementById('game-area').style.display = 'none';
     document.getElementById('leaderboard-area').style.display = 'none';
+
+    // Hide stats when returning to the menu
+    document.getElementById('stats-display').style.display = 'none';
 }
 
-// Quit Modal Functions
-function showQuitModal() {
-    document.getElementById('quit-modal').style.display = 'flex';
-}
-
-function closeModal() {
-    document.getElementById('quit-modal').style.display = 'none';
-}
-
-function confirmQuit() {
-    alert('Thanks for playing!');
-    window.location.href = '/';
-}
-
-// Fetch and Display Airports
-async function getAirports() {
-    try {
-        const response = await fetch(`${apiBaseUrl}/get_airports`);
-        const data = await response.json();
-
-        if (response.ok) {
-            const airportList = data.map(
-                airport => `<li>${airport.name} (${airport.iso_country})</li>`
-            ).join('');
-            document.getElementById('airports').innerHTML = `<ul>${airportList}</ul>`;
-        } else {
-            alert('Failed to fetch airports.');
-        }
-    } catch (error) {
-        alert('Error fetching airports.');
-        console.error(error);
-    }
-}
-
-// Perform a Task in the Game
-async function performTask() {
-    try {
-        const response = await fetch(`${apiBaseUrl}/perform_task`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-            document.getElementById('task-result').innerText = `Task: ${data.task}, Result: ${data.result}`;
-        } else {
-            alert('Failed to perform task.');
-        }
-    } catch (error) {
-        alert('Error performing task.');
-        console.error(error);
-    }
-}
-
-// Fetch and Display Leaderboard
 async function showLeaderboard() {
     try {
-        const response = await fetch(`${apiBaseUrl}/leaderboard`);
+        const response = await fetch(`${apiBaseUrl}/leaderboard`); // Backend API endpoint
         const data = await response.json();
 
         if (response.ok) {
             const tableBody = document.getElementById('leaderboard-table').querySelector('tbody');
-            tableBody.innerHTML = '';
+            tableBody.innerHTML = ''; // Clear existing rows
 
             data.forEach(player => {
                 const row = document.createElement('tr');
@@ -154,14 +96,39 @@ async function showLeaderboard() {
             document.getElementById('menu').style.display = 'none';
             document.getElementById('leaderboard-area').style.display = 'block';
         } else {
-            alert('Failed to fetch leaderboard.');
+            alert('Failed to fetch leaderboard data.');
         }
     } catch (error) {
-        alert('Error fetching leaderboard.');
+        alert('Error fetching leaderboard data.');
         console.error(error);
     }
 }
+
 function returnToMenu() {
-    document.getElementById('menu').style.display = 'block';
+    // Hide the leaderboard area
     document.getElementById('leaderboard-area').style.display = 'none';
+
+    // Show the main menu
+    document.getElementById('menu').style.display = 'block';
+}
+
+// Update stats display
+function updateStats() {
+    document.getElementById("health-bar").innerText = `${health}/10`;
+    document.getElementById("antidotes-count").innerText = `${antidotes}/5`;
+    document.getElementById("visited-countries-count").innerText = `${visitedCountries}`;
+}
+
+// Quit Modal Functions
+function showQuitModal() {
+    document.getElementById('quit-modal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('quit-modal').style.display = 'none';
+}
+
+function confirmQuit() {
+    alert('Thanks for playing!');
+    window.location.href = '/';
 }

@@ -85,4 +85,3 @@ def outfit_compliment():
         player["health"] -= 1
         return False
 
-
