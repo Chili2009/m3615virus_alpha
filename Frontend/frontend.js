@@ -38,15 +38,20 @@ function submitName() {
 function proceedToDestination() {
     document.getElementById('story-section').style.display = 'none';
     document.getElementById('choose-destination').style.display = 'block';
-
+     // Show the title at the top of the screen
+    document.getElementById('flight-title').style.display = 'none';
     // Hide stats during the choose destination phase
     document.getElementById('stats-display').style.display = 'none';
 }
+
 
 // Proceed to the game area
 function proceedToGame() {
     document.getElementById('choose-destination').style.display = 'none';
     document.getElementById('game-area').style.display = 'block';
+
+     // Show the title on the last page
+    document.getElementById('flight-title').style.display = 'block';
 
     // Show stats only in the game area
     document.getElementById('stats-display').style.display = 'block';
@@ -60,6 +65,9 @@ function showMenu() {
     document.getElementById('choose-destination').style.display = 'none';
     document.getElementById('game-area').style.display = 'none';
     document.getElementById('leaderboard-area').style.display = 'none';
+
+    // Hide the title
+    document.getElementById('flight-title').style.display = 'none';
 
     // Hide stats when returning to the menu
     document.getElementById('stats-display').style.display = 'none';
