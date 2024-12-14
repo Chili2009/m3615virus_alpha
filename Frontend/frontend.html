@@ -44,12 +44,12 @@
     </div>
 
     <div id="flight-title" style="display: none;">
-    <p style="text-align: center; font-size: 24px; font-weight: bold; margin: 0;">
-        Choose where to fly!
-    </p>
+        <p style="text-align: center; font-size: 24px; font-weight: bold; margin: 0;">
+            Choose where to fly!
+        </p>
         <ul id="country-list" style="margin-top: 20px; padding: 0; text-align: center;">
-        <!-- Countries will be dynamically populated -->
-    </ul>
+            <!-- Countries will be dynamically populated -->
+        </ul>
     </div>
 
     <div id="stats-display" style="display: none;">
@@ -57,6 +57,13 @@
         <p><strong>Antidotes:</strong> <span id="antidotes-count">0/5</span></p>
         <p><strong>Visited Countries:</strong> <span id="visited-countries-count">0/9</span></p>
     </div>
+
+ <div id="outcome-page" style="display: none;">
+    <h2 id="outcome-title"></h2>
+    <p id="outcome-description"></p>
+    <button onclick="returnToDestination()">Return</button>
+</div>
+
 
     <!-- Game Area -->
     <div id="game-area" style="display: none;">

@@ -60,14 +60,12 @@ function handleCountryClick(country) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Travel Outcome:", data); // Debugging
-
         if (data.outcome === "task") {
-            alert(`You have a task: ${data.task}`);
+            showOutcomePage("Task", `You have a task: ${data.task}`);
         } else if (data.outcome === "event") {
-            alert(`An event occurred: ${data.event}`);
+            showOutcomePage("Event", `An event occurred: ${data.event}`);
         } else {
-            alert(data.message); // "Nothing happened during the travel."
+            showOutcomePage("Nothing", "Nothing happened during the travel.");
         }
     })
     .catch(error => console.error("Error:", error));
@@ -105,6 +103,36 @@ function proceedToGame() {
     document.getElementById('stats-display').style.display = 'block';
     updateStats();
 }
+// Show the outcome page
+function showOutcomePage(title, description) {
+    // Hide other sections
+    document.getElementById("choose-destination").style.display = "none";
+    document.getElementById("flight-title").style.display = "none";
+
+    // Show the outcome page and set the content
+    document.getElementById("outcome-page").style.display = "block";
+    document.getElementById("outcome-title").textContent = title;
+    document.getElementById("outcome-description").textContent = description;
+}
+
+// Return to the destination selection
+function returnToDestination() {
+    // Hide the outcome page and any other sections
+    document.getElementById("outcome-page").style.display = "none";
+    document.getElementById("choose-destination").style.display = "none";
+
+    // Show the flight title and country list
+    document.getElementById("flight-title").style.display = "block";
+
+    // Ensure the country list is correctly populated
+    const countryList = document.getElementById("country-list");
+    countryList.innerHTML = ""; // Clear existing list
+    populateCountryList(); // Repopulate the list
+
+    // Show stats (if required)
+    document.getElementById("stats-display").style.display = "block";
+}
+
 
 // Show the main menu
 function showMenu() {
