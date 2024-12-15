@@ -16,7 +16,7 @@ Jos et onnistu parantamaan itseäsi ennen kuin saavut viimeiseen maahan, KUOLET.
 Ole tarkkana — matkasi varrella saattaa tapahtua yllätyksiä!
 
 ## Pelin käynnistys
-#MYSQl tietokanta -> lataa sql file (lataa tietokantaan)
-#käynnistä flask ->
-#windows: start Frontend/frontend.html
-#Unix: Open Frontend/frontend.html
+MYSQl tietokanta -> lataa sql file (lataa tietokantaan)
+käynnistä flask ->
+windows: start Frontend/frontend.html
+Unix: Open Frontend/frontend.html
