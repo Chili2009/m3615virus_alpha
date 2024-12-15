@@ -1,6 +1,29 @@
+@font-face {
+    font-family: "VT323", monospace;
+    src: url("VT323-Regular.ttf") format("truetype");
+}
+
+.vt323-regular {
+  font-family: "VT323", monospace;
+  font-weight: 400;
+  font-style: normal;
+}
+
+#app {
+    text-align: center;
+    background: #000000;
+    border: solid #ffffff;
+    padding: 20px;
+    width: 400px;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f8ff;
+    font-family: "VT323", sans-serif;
+    background-image: url("Images/menu_bg.png");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: black;
     margin: 0;
     padding: 0;
     display: flex;
@@ -10,31 +33,21 @@ body {
 }
 
 
-#app {
-    text-align: center;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 400px;
-}
-
-
 button {
-    background-color: #4caf50;
+    background-color: #000000;
     color: white;
-    border: none;
+    border: solid white;
     padding: 10px 20px;
     margin: 10px;
     font-size: 16px;
-    border-radius: 4px;
     cursor: pointer;
     text-transform: uppercase;
+    font-family: "VT323", monospace, sans-serif;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #ffffff;
+    color: black;
 }
 
 button:focus {
@@ -50,16 +63,20 @@ button:focus {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
+    color: white;
     justify-content: center;
     align-items: center;
 }
 
 .modal-content {
-    background-color: white;
+    background-color: #000000;
     padding: 20px;
-    border-radius: 8px;
     text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: solid white;
+}
+
+#username {
+    font-family: "VT323", monospace, sans-serif;
 }
 
 .modal-buttons {
@@ -69,61 +86,71 @@ button:focus {
 .modal-buttons button {
     margin: 5px;
     padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
     font-size: 16px;
     cursor: pointer;
 }
 
 .modal-buttons button:first-child {
-    background-color: #f44336;
+    background-color: #000000;
     color: white;
 }
 
 .modal-buttons button:last-child {
-    background-color: #4caf50;
+    background-color: #000000;
     color: white;
 }
 
 .modal-buttons button:hover {
     opacity: 0.9;
+    background-color: white;
+    color: black;
 }
 
+.menu {
+    color: white;
+    background-color: black;
+    font-family: "VT323", sans-serif;
+    border: solid white;
+}
+
+h1 {
+    color: white;
+}
 
 #name-entry-modal {
-    display: none;
     position: fixed;
+    border: solid;
     z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 #name-entry-modal .modal-content {
-    background-color: white;
+    background-color: #000000;
+    color: white;
     padding: 20px;
-    border-radius: 12px;
     width: 300px;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 #name-entry-modal p {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 15px;
+    color: white;
 }
 
 #name-entry-modal input {
     width: 90%;
     padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
+    border: solid #ccc;
     font-size: 16px;
     margin-bottom: 20px;
 }
@@ -133,18 +160,17 @@ button:focus {
     justify-content: space-between;
 }
 
+
 #name-entry-modal .modal-buttons button {
     padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
     font-size: 16px;
     cursor: pointer;
-    background-color: #4caf50;
+    background-color: #000000;
     color: white;
 }
 
 #name-entry-modal .modal-buttons button:last-child {
-    background-color: #f44336;
+    background-color: #000000;
 }
 
 
@@ -156,18 +182,20 @@ button:focus {
 #story-section h2 {
     font-size: 24px;
     margin-bottom: 20px;
+    color: white;
 }
 
 #story-section button {
     background-color: transparent;
-    border: none;
+    border: solid white;
     font-size: 30px;
     cursor: pointer;
-    color: #4caf50;
+    color: #ffffff;
 }
 
 #story-section button:hover {
-    color: #45a049;
+    background-color: white;
+    color: #000000;
 }
 
 
@@ -177,14 +205,14 @@ button:focus {
     padding: 20px;
     height: auto;
     overflow: hidden;
+    color: white;
 }
 
 
 #choose-destination .cockpit {
     position: relative;
-    background-color: #f4f4f4;
-    border: 2px solid #ccc;
-    border-radius: 12px;
+    background-color: #000000;
+    color: white;
     padding: 40px;
     width: 80%;
     margin: 0 auto;
@@ -193,7 +221,6 @@ button:focus {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 #choose-destination h2 {
@@ -201,25 +228,23 @@ button:focus {
     margin-bottom: 20px;
     font-weight: bold;
     text-transform: uppercase;
+    color: white;
 }
 
 #choose-destination .arrow-down {
     font-size: 40px;
-    color: #4caf50;
+    color: #ffffff;
     margin-top: 10px;
 }
 
-#choose-destination .arrow-down:hover {
-    color: #45a049;
+#flight-title {
+    width: 400px;
+    padding: 10px;
+    background-color: #000000;
+    color: white;
+    text-align: center;
 }
 
-#flight-title {
-    position: relative;
-    margin: 0 auto;
-    text-align: center;
-    padding: 10px 0;
-    background-color: #f0f8ff;
-}
 
 
 #flight-title p {
@@ -229,39 +254,33 @@ button:focus {
 }
 
 #country-list {
-    list-style: none;
-    padding: 0;
-    margin: 20px auto;
-    text-align: center;
-    font-size: 18px;
-    max-height: 250px;
-    overflow-y: auto;
-    width: 90%;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 20px;
+    justify-content: center;
 }
-
 #country-list li {
     padding: 10px;
     margin: 5px 0;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
+    background-color: black;
+    color: white;
     cursor: pointer;
 }
 
 #country-list li:hover {
     background-color: #e0f7fa;
+    color: black;
 }
 
 
 #stats-display {
-    margin-top: 20px;
     text-align: left;
     font-size: 16px;
     padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    background-color: #000000;
+    color: white;
+    border: solid #ffffff;
     width: 90%;
     margin: 0 auto;
 }
@@ -274,10 +293,10 @@ button:focus {
     text-align: center;
     margin: 50px auto;
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
+    border: solid #ccc;
     max-width: 500px;
-    background-color: #f9f9f9;
+    color: white;
+    background-color: #000000;
 }
 
 #outcome-page h2 {
@@ -293,15 +312,16 @@ button:focus {
 #outcome-page button {
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #4caf50;
+    background-color: #000000;
     color: white;
-    border: none;
-    border-radius: 5px;
+    border: solid;
     cursor: pointer;
 }
 
 #outcome-page button:hover {
-    background-color: #45a049;
+    background-color: #ffffff;
+    color: #000000;
+    border: solid;
 }
 
 
@@ -312,20 +332,20 @@ button:focus {
 }
 
 #leaderboard-table th, #leaderboard-table td {
-    border: 1px solid #ccc;
+    border: solid #ccc;
     padding: 10px;
     text-align: center;
 }
 
 #leaderboard-table th {
-    background-color: #f4f4f4;
+    background-color: #000000;
     font-weight: bold;
 }
 
 #leaderboard-table tbody tr:nth-child(odd) {
-    background-color: #f9f9f9;
+    background-color: #000000;
 }
 
 #leaderboard-table tbody tr:nth-child(even) {
-    background-color: #fff;
+    background-color: #000000;
 }
