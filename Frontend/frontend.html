@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flight Game</title>
     <link rel="stylesheet" href="frontend.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mansalva&family=Pixelify+Sans&family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
 <div id="app">
@@ -28,37 +31,41 @@
     </div>
 
     <div id="story-section" style="display: none;">
-        <h2>Placeholder Story...</h2>
-        <button onclick="proceedToDestination()">&#9658;</button>
+        <h2>
+            You have been infected by the deadly <strong>M-3615 Virus!</strong> <br>
+            To survive, you must travel across Europe to collect antidotes. <br>
+            Select a country on the map to travel to. Complete tasks to collect antidotes.
+        </h2>
+        <button onclick="proceedToDestination()
+        backgroundCheck('cockpit')">&#9658;</button>
     </div>
 
     <div id="choose-destination" style="display: none;">
         <div class="cockpit">
             <h2>CHOOSE NEXT DESTINATION</h2>
             <div class="arrow-down">&#8595;</div>
-            <button onclick="proceedToGame()">&#9658;</button>
+            <button onclick="proceedToGame()
+            backgroundCheck('map')">TO MAP</button>
         </div>
     </div>
-
-    <div id="flight-title" style="display: none;">
-        <p style="text-align: center; font-size: 24px; font-weight: bold; margin: 0;">
-            Choose where to fly!
-        </p>
-        <ul id="country-list" style="margin-top: 20px; padding: 0; text-align: center;">
-            <!-- Countries will be dynamically populated -->
-        </ul>
-    </div>
-
-    <div id="stats-display" style="display: none;">
-        <p><strong>Health:</strong> <span id="health-bar">10/10</span></p>
-        <p><strong>Antidotes:</strong> <span id="antidotes-count">0/5</span></p>
-        <p><strong>Visited Countries:</strong> <span id="visited-countries-count">0/9</span></p>
-    </div>
-
+        <div id="flight-title" style="display: none;">
+            <p style="text-align: center; font-size: 24px; font-weight: bold; margin: 0;">
+                Choose where to fly!
+            </p>
+            <ul id="country-list" style="margin-top: 20px; padding: 0; text-align: center;">
+                <!-- Countries will be dynamically populated -->
+            </ul>
+            <div id="stats-display" style="display: none;">
+                <p><strong>Health:</strong> <span id="health-bar">10/10</span></p>
+                <p><strong>Antidotes:</strong> <span id="antidotes-count">0/5</span></p>
+                <p><strong>Visited Countries:</strong> <span id="visited-countries-count">0/9</span></p>
+            </div>
+        </div>
     <div id="outcome-page" style="display: none;">
         <h2 id="outcome-title"></h2>
         <p id="outcome-description"></p>
-        <button onclick="returnToDestination()">Return</button>
+        <button onclick="returnToDestination()
+        backgroundCheck('map')">Return</button>
     </div>
 
 
@@ -94,6 +101,24 @@
         </div>
     </div>
 </div>
+
+<script>
+        function backgroundCheck(status) {
+            if (status === "cockpit") {
+                document.querySelector("body").style.backgroundImage = "url(Images/cockpit_bg.png)";
+            } else if (status === "map") {
+                document.querySelector("body").style.backgroundImage = "url(Images/map_bg.png)";
+            } else if (status === "airport") {
+                document.querySelector("body").style.backgroundImage = "url(Images/airport_bg.png)";
+            } else if (status === "end-bad") {
+                document.querySelector("body").style.backgroundImage = "url(Images/lost_bg.png)";
+            } else if (status === "menu") {
+                document.querySelector("body").style.backgroundImage = "url(Images/menu_bg.png)";
+            } else {
+                document.querySelector("body").style.backgroundImage = "url(Images/menu_bg.png)";
+            }
+        }
+    </script>
 
 <script src="frontend.js"></script>
 </body>
