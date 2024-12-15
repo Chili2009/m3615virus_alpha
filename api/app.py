@@ -26,11 +26,11 @@ def get_airports():
 @app.route("/travel", methods=["POST"])
 def travel():
     outcomes = (
-        ["task"] * 10 +  # 10 tasks
-        ["event"] * 5 +  # 5 events
-        ["nothing"] * 5  # 5 "nothing" outcomes
+        ["task"] * 10 +
+        ["event"] * 5 +
+        ["nothing"] * 5
     )
-    outcome = random.choice(outcomes)  # Randomly select an outcome
+    outcome = random.choice(outcomes)
 
     if outcome == "task":
         tasks = [

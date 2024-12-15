@@ -1,7 +1,6 @@
-// Base API URL
+
 const apiBaseUrl = 'http://localhost:5000';
 
-// Stats variables
 let health = 10;
 let antidotes = 0;
 let visitedCountries = 0;
@@ -104,7 +103,7 @@ function populateCountryList() {
         const listItem = document.createElement("li");
         listItem.textContent = country;
         listItem.className = "country-item";
-        listItem.addEventListener("click", () => handleCountryClick(country)); // Attach click event
+        listItem.addEventListener("click", () => handleCountryClick(country));
         countryList.appendChild(listItem);
     });
 }
@@ -155,7 +154,7 @@ function showMenu() {
 }
 
 /* ------------------------------
-   Leaderboard Handling
+   Leaderboard
 ------------------------------ */
 async function showLeaderboard() {
     try {
@@ -163,7 +162,7 @@ async function showLeaderboard() {
         const data = await response.json();
         if (response.ok) {
             const tableBody = document.getElementById('leaderboard-table').querySelector('tbody');
-            tableBody.innerHTML = ''; // Clear existing rows
+            tableBody.innerHTML = '';
             data.forEach(player => {
                 const row = document.createElement('tr');
                 const nameCell = document.createElement('td');
