@@ -1,0 +1,167 @@
+from flask import Flask
+import random
+import mysql.connector
+import json
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
+
+conn = mysql.connector.connect(
+    host='mysql.metropolia.fi',
+    port=3306,
+    database='miafe',
+    user='miafe',
+    password='abcd',
+    autocommit=True
+)
+
+# Select from 20 airports in Europe for the game
+@app.route('/get_airport')
+def get_airport():
+    sql = """SELECT iso_country, ident, name, type, latitude_deg, longitude_deg
+FROM airport
+WHERE continent = 'EU'
+AND type = 'large_airport'
+AND iso_country IN ('FI', 'SE', 'NO', 'EE', 'LV', 'LT', 'PL', 'SK',
+                    'HU', 'AT', 'DE', 'CH', 'CZ', 'BE', 'NL',
+                    'FR', 'DK', 'GB', 'IE', 'IS')
+GROUP BY iso_country
+ORDER BY RAND()
+LIMIT 20;"""
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+# Get all goals
+@app.route('/get_antidotes')
+def get_antidotes():
+    sql = "SELECT * FROM antidotes"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+@app.route('/country')
+def country():
+    sql = "SELECT * FROM countries"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+@app.route('/event')
+def event():
+    sql = "SELECT * FROM events"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+@app.route('/leaderboard')
+def leaderboard():
+    sql = "SELECT * FROM leaderboard"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+@app.route('/players')
+def players():
+    sql = "SELECT * FROM players"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+@app.route('/tasks')
+def tasks():
+    sql = "SELECT * FROM tasks"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return results
+
+# Create a new game
+@app.route('/create_game/<username>')
+def create_game(username):
+    health_bar = 10
+    current_airport = random.randint(1, 20)
+    countries_visited = 0
+    collected_antidotes = {}
+    sql = (
+        "INSERT INTO player(username, health_bar, current_airport, countries_visited, collected_antidotes) VALUES (%s, %s, %s, %s, %s)"
+    )
+    data = (username, health_bar, current_airport, countries_visited, collected_antidotes)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql, data)
+    conn.commit()
+
+completed_tasks = set()
+completed_events = set()
+
+@app.route('/create_random_task')
+def create_random_task():
+    global completed_tasks
+    remaining_tasks = [task for task in tasks() if task['id'] not in completed_tasks]
+    if not remaining_tasks:
+        return "No more tasks available!"
+
+    task = random.choice(remaining_tasks)
+    completed_tasks.add(task['id'])
+    return task
+
+@app.route('/create_random_event')
+def create_random_event():
+    global completed_events
+    events_data = event()  # Fetch the events from the database
+
+    remaining_events = [event_item for event_item in events_data if event_item['id'] not in completed_events]
+    if not remaining_events:
+        return "No more events available!"
+
+    event_item = random.choice(remaining_events)
+    completed_events.add(event_item['id'])
+    return event_item
+
+@app.route('/travel')
+def travel():
+    outcomes = ["task"] * 9 + ["event"] * 5 + ["nothing"] * 6
+    outcome = random.choice(outcomes)
+
+    if outcome == "task":
+        task = create_random_task()
+        return task if task else "No more tasks available!"
+    elif outcome == "event":
+        event = create_random_event()
+        return event if event else "No more events available!"
+    else:
+        return "Nothing happened during this travel."
+
+# Add player to leaderboard
+@app.route('/add_to_leaderboard/<username>/<time>/<health>')
+def add_to_leaderboard(username, time, health):
+    sql = "INSERT INTO leaderboard (username, time, health) VALUES (%s, %s, %s)"
+    data = (username, time, health)
+    cursor = conn.cursor()
+    cursor.execute(sql, data)
+    conn.commit()
+    return "Added to leaderboard!"
+
+@app.route('/update_player_progress/<player_id>/<health>/<visited_countries>/<antidotes_collected>')
+def update_player_progress(player_id, health, visited_countries, antidotes_collected):
+    sql = '''UPDATE player
+             SET healthbar = %s,
+                 countries_visited = JSON_ARRAY_APPEND(countries_visited, '$', %s),
+                 collected_antidotes = %s
+             WHERE player_id = %s'''
+    cursor = conn.cursor()
+    cursor.execute(sql, (health, json.dumps(visited_countries), json.dumps(antidotes_collected), player_id))
+    conn.commit()
+    return {"player_id": player_id, "health": health, "visited_countries": visited_countries,
+            "antidotes_collected": antidotes_collected}
+
+# Other parts like menus and input-based interactions are removed.
+if __name__ == '__main__':
+    app.run(use_reloader=True, host='127.0.0.1', port=3000)
