@@ -1,0 +1,407 @@
+const nameform = document.querySelector("#name-form");
+if (nameform) {
+    nameform.addEventListener('submit', async function(evt) {
+        evt.preventDefault();
+        document.querySelector("#nameinput").close();  // Close the name input dialog
+        const name = document.querySelector("#name-input").value;
+        document.querySelector("#p_name").innerHTML = "<b>Name: </b>" + name;
+        const response = await fetch(`${url}/create_game/${name}`);
+        const result = await response.json();
+        const url = 'http://127.0.0.1:3000';
+
+        game_id = result["game_id"];
+        cur_health = result["health"];
+        cur_countries_visited = result["visited_countries"];
+        cur_antidotes_collected = result["antidotes_collected"];
+
+        await updates(); // Update UI after starting the game
+    });
+} else {
+    console.error("Name form not found!");
+}
+
+document.querySelector('#nameinput').showModal();
+
+function updateUI(health, countriesVisited, antidotesCollected) {
+    document.querySelector("#health").innerHTML = `${health}/15`;
+    document.querySelector("#countries").innerHTML = `${countriesVisited}/20`;
+    document.querySelector('#antidotes').innerHTML = `${antidotesCollected}/10`;
+}
+
+async function updates() {
+    try {
+        const response = await fetch(`${url}/update_player_progress/${game_id}/${cur_health}/${cur_countries_visited}/${cur_antidotes_collected}`);
+        const result = await response.json();
+        cur_health = result["health"];
+        cur_countries_visited = result["visited_countries"];
+        cur_antidotes_collected = result["antidotes_collected"];
+    } catch (error) {
+        console.log("Error updating progress:", error);
+    }
+
+    updateUI(cur_health, cur_countries_visited, cur_antidotes_collected);
+}
+
+
+    game_id = result["game_id"];
+    cur_health = result["health"];
+    cur_countries_visited = result["visited_countries"];
+    cur_antidotes_collected = result["antidotes_collected"];
+
+    async function updates() {
+    try {
+        const response = await fetch(`${url}/update_player_progress/${game_id}/${cur_health}/${cur_countries_visited}/${cur_antidotes_collected}`);
+        const result = await response.json();
+
+        cur_health = result["health"];
+        cur_countries_visited = result["visited_countries"];
+        cur_antidotes_collected = result["antidotes_collected"];
+    } catch (error) {
+        console.log("Error updating progress:", error);
+    }
+
+    updateUI(cur_health, cur_countries_visited, cur_antidotes_collected);
+}
+
+// Nappien toiminnallisuudet
+
+// Peli alkaa
+if (typeof document.querySelector('#nameinput').showModal === 'function') {
+    document.querySelector('#start-game').addEventListener('click', () => {
+        document.querySelector('#nameinput').showModal();
+        document.querySelector('#main-menu').classList.add('hidden');
+    });
+} else {
+    console.error("showModal() is not supported in this browser.");
+}
+
+
+// Handle name submission and start the game
+nameform.addEventListener('submit', async function(evt){
+    evt.preventDefault();
+    document.querySelector("#nameinput").close(); // Close the name input dialog
+    const name = document.querySelector("#name-input").value;
+    document.querySelector("#p_name").innerHTML = "<b>Name: </b>" + name;
+    const response = await fetch(`${url}/create_game/${name}`);
+    const result = await response.json();
+
+    game_id = result["game_id"];
+    cur_health = result["health"];
+    cur_countries_visited = result["visited_countries"];
+    cur_antidotes_collected = result["antidotes_collected"];
+
+    await updates(); // Update UI after starting the game
+});
+
+// Peli lopetetaan
+document.querySelector('#quit-game').addEventListener('click', () => {
+    document.querySelector('#cockpit').classList.add('hidden');
+    document.querySelector('#main-menu').classList.remove('hidden');
+});
+
+// Maailmankartta, jossa pelaaja voi valita matkauskohteet
+document.querySelector('#map-button').addEventListener('click', async () => {
+    document.querySelector('#cockpit').classList.add('hidden');
+    document.querySelector('#map-view').classList.remove('hidden');
+
+    const countries = await getCountry();
+    const mapContainer = document.querySelector('#map-container');
+    mapContainer.innerHTML = ''; // Tyhjennetään aiemmat maat
+
+    countries.forEach(country => {
+        const countryButton = document.createElement('button');
+        countryButton.innerText = country.name;
+        countryButton.addEventListener('click', () => travelToCountry(country.id));
+        mapContainer.appendChild(countryButton);
+    });
+});
+
+async function travelToCountry(countryId) {
+    const response = await fetch(`${url}/travel_to_country/${game_id}/${countryId}`);
+    const result = await response.json();
+
+    if (result.success) {
+        cur_countries_visited++;
+        await updates();
+        alert(`You have traveled to ${result.country.name}`);
+    } else {
+        alert("Travel failed. Try again later.");
+    }
+
+    document.querySelector('#map-view').classList.add('hidden');
+    document.querySelector('#cockpit').classList.remove('hidden');
+}
+
+// Tehtävät ja tapahtumat, jotka pelaaja voi suorittaa
+document.querySelector('#complete-task-event').addEventListener('click', async () => {
+    document.querySelector('#cockpit').classList.add('hidden');
+    document.querySelector('#task-event-view').classList.remove('hidden');
+
+    // Esimerkki tehtävän suorittamisesta
+    const response = await fetch(`${url}/complete_task_event/${game_id}`);
+    const result = await response.json();
+
+    if (result.success) {
+        cur_antidotes_collected++;
+        await updates();
+        alert("Task/Event completed successfully.");
+    } else {
+        alert("Task/Event failed.");
+    }
+
+    document.querySelector('#task-event-view').classList.add('hidden');
+    document.querySelector('#cockpit').classList.remove('hidden');
+});
+
+// Pelaajan terveystilanteen, kerättyjen lääkkeiden ja vieraillujen maiden päivittäminen
+async function updatePlayerStats() {
+    const response = await fetch(`${url}/update_player_progress/${game_id}/${cur_health}/${cur_countries_visited}/${cur_antidotes_collected}`);
+    const result = await response.json();
+
+    cur_health = result["health"];
+    cur_countries_visited = result["visited_countries"];
+    cur_antidotes_collected = result["antidotes_collected"];
+
+    updateUI(cur_health, cur_countries_visited, cur_antidotes_collected);
+}
+
+// Fetch airport data
+async function getAirport() {
+    try {
+        const response = await fetch(`${url}/get_airport`);
+        const airports = await response.json();
+        return airports;
+    } catch (error) {
+        console.error("Error fetching airport data:", error);
+    }
+}
+
+// Fetch all antidotes
+async function getAntidotes() {
+    try {
+        const response = await fetch(`${url}/get_antidotes`);
+        const antidotes = await response.json();
+        return antidotes;
+    } catch (error) {
+        console.error("Error fetching antidotes:", error);
+    }
+}
+
+// Fetch country data
+async function getCountry() {
+    try {
+        const response = await fetch(`${url}/country`);
+        const countries = await response.json();
+        return countries;
+    } catch (error) {
+        console.error("Error fetching countries:", error);
+    }
+}
+
+// Fetch event data
+async function getEvent() {
+    try {
+        const response = await fetch(`${url}/event`);
+        const events = await response.json();
+        return events;
+    } catch (error) {
+        console.error("Error fetching events:", error);
+    }
+}
+
+// Fetch leaderboard data
+async function getLeaderboard() {
+    try {
+        const response = await fetch(`${url}/leaderboard`);
+        const leaderboard = await response.json();
+        return leaderboard;
+    } catch (error) {
+        console.error("Error fetching leaderboard:", error);
+    }
+}
+
+// Fetch player data
+async function getPlayers() {
+    try {
+        const response = await fetch(`${url}/players`);
+        const players = await response.json();
+        return players;
+    } catch (error) {
+        console.error("Error fetching players:", error);
+    }
+}
+
+// Fetch tasks
+async function getTasks() {
+    try {
+        const response = await fetch(`${url}/tasks`);
+        const tasks = await response.json();
+        return tasks;
+    } catch (error) {
+        console.error("Error fetching tasks:", error);
+    }
+}
+
+// Create a new game
+async function createGame(username) {
+    try {
+        const response = await fetch(`${url}/create_game/${username}`);
+        const gameData = await response.json();
+        return gameData;
+    } catch (error) {
+        console.error("Error creating game:", error);
+    }
+}
+
+// Create a random task
+async function createRandomTask() {
+    try {
+        const response = await fetch(`${url}/create_random_task`);
+        const task = await response.json();
+        return task;
+    } catch (error) {
+        console.error("Error creating random task:", error);
+    }
+}
+
+// Create a random event
+async function createRandomEvent() {
+    try {
+        const response = await fetch(`${url}/create_random_event`);
+        const event = await response.json();
+        return event;
+    } catch (error) {
+        console.error("Error creating random event:", error);
+    }
+}
+
+// Travel outcome
+async function travel() {
+    try {
+        const response = await fetch(`${url}/travel`);
+        const travelOutcome = await response.json();
+        return travelOutcome;
+    } catch (error) {
+        console.error("Error during travel:", error);
+    }
+}
+
+// Add player to leaderboard
+async function addToLeaderboard(username, time, health) {
+    try {
+        const response = await fetch(`${url}/add_to_leaderboard/${username}/${time}/${health}`, { method: 'POST' });
+        if (response.ok) {
+            console.log("Player added to leaderboard.");
+        }
+    } catch (error) {
+        console.error("Error adding to leaderboard:", error);
+    }
+}
+
+// Update player progress
+async function updatePlayerProgress(playerId, health, visitedCountries, antidotesCollected) {
+    try {
+        const response = await fetch(
+            `${url}/update_player_progress/${playerId}/${health}/${JSON.stringify(visitedCountries)}/${JSON.stringify(antidotesCollected)}`
+        );
+        const updatedData = await response.json();
+        return updatedData;
+    } catch (error) {
+        console.error("Error updating player progress:", error);
+    }
+}
+
+// Fetch the menu
+async function showMenu() {
+    try {
+        const response = await fetch(`${url}/show_menu`);
+        const menu = await response.text();
+        console.log(menu);
+    } catch (error) {
+        console.error("Error fetching menu:", error);
+    }
+}
+
+// Handle "You Survived" screen
+async function survivedScreen(username, time, health) {
+    try {
+        const response = await fetch(`${url}/survived_screen/${username}/${time}/${health}`);
+        const message = await response.text();
+        console.log(message);
+    } catch (error) {
+        console.error("Error displaying survived screen:", error);
+    }
+}
+
+// Handle "Game Over" screen
+async function lostScreen() {
+    try {
+        const response = await fetch(`${url}/lost_screen`);
+        const message = await response.text();
+        console.log(message);
+    } catch (error) {
+        console.error("Error displaying game over screen:", error);
+    }
+    document.querySelector("#start-game").addEventListener("click", () => {
+    document.querySelector("#name-dialog").showModal();
+});
+
+document.querySelector("#quit-game").addEventListener("click", () => {
+    window.close(); // or redirect to another page, like a homepage
+});
+
+document.querySelector("#submit-name").addEventListener("click", () => {
+    playerName = document.querySelector("#player-name").value;
+    if (playerName) {
+        document.querySelector("#player-name-display").innerText = playerName;
+        document.querySelector("#main-menu").style.display = "none";
+        document.querySelector("#cockpit").style.display = "block";
+        document.querySelector("#name-dialog").close();
+    } else {
+        alert("Please enter a name.");
+    }
+});
+
+document.querySelector("#open-map").addEventListener("click", () => {
+    // Populate countries list in the map
+    const dropdown = document.querySelector("#countries-dropdown");
+    dropdown.innerHTML = ''; // Clear previous options
+    countries.forEach((country) => {
+        const option = document.createElement("option");
+        option.value = country;
+        option.innerText = country;
+        dropdown.appendChild(option);
+    });
+    document.querySelector("#map-dialog").showModal();
+});
+
+document.querySelector("#close-map").addEventListener("click", () => {
+    document.querySelector("#map-dialog").close();
+});
+
+document.querySelector("#close-mapp").addEventListener("click", () => {
+    document.querySelector("#map-dialog").close();
+});
+
+document.querySelector("#select-country").addEventListener("click", () => {
+    currentCountry = document.querySelector("#countries-dropdown").value;
+    if (currentCountry) {
+        alert(`You have selected ${currentCountry}!`);
+        countriesVisited++;
+        document.querySelector("#player-stats").innerText = `Health: ${health}/15 | Countries Visited: ${countriesVisited}/20 | Antidotes Collected: ${antidotes}/10`;
+        document.querySelector("#map-dialog").close();
+    }
+});
+
+document.querySelector("#start-task").addEventListener("click", () => {
+    // Simulate random task/event (to be expanded)
+    const event = Math.random() > 0.5 ? "Task" : "Event";
+    alert(`A random ${event} has occurred!`);
+});
+
+document.querySelector("#quit-game-cockpit").addEventListener("click", () => {
+    document.querySelector("#cockpit").style.display = "none";
+    document.querySelector("#main-menu").style.display = "block";
+});
+
+}
